@@ -6,6 +6,9 @@ import (
 	"log"
 	"math/big"
 	"os"
+	"strconv"
+
+	"github.com/fatih/color"
 )
 
 // Puzzle struct
@@ -30,10 +33,8 @@ func Init(size int) *Puzzle {
 		Case: make([]int, size*size),
 	}
 	for i := range u.Case {
-		fmt.Println(i)
 		u.Case[i] = -1
 	}
-	fmt.Print(u)
 	return &u
 }
 
@@ -67,19 +68,19 @@ func (p *Puzzle) makeGoals() {
 // MakePuzzle create a new puzzle
 func MakePuzzle(size int, solvable bool, iterations uint) (p *Puzzle, err error) {
 	p = Init(size)
-	// p.makeGoals()
-	// for i := 0; uint(i) < iterations; i++ {
-	// 	if err = p.SwapEmpty(); err != nil {
-	// 		return
-	// 	}
-	// }
-	// if !solvable {
-	// 	if p.Case[0] == 0 || p.Case[1] == 0 {
-	// 		p.Case[len(p.Case)-1], p.Case[len(p.Case)-2] = p.Case[len(p.Case)-2], p.Case[len(p.Case)-1]
-	// 	} else {
-	// 		p.Case[0], p.Case[1] = p.Case[1], p.Case[0]
-	// 	}
-	// }
+	p.makeGoals()
+	for i := 0; uint(i) < iterations; i++ {
+		if err = p.SwapEmpty(); err != nil {
+			return
+		}
+	}
+	if !solvable {
+		if p.Case[0] == 0 || p.Case[1] == 0 {
+			p.Case[len(p.Case)-1], p.Case[len(p.Case)-2] = p.Case[len(p.Case)-2], p.Case[len(p.Case)-1]
+		} else {
+			p.Case[0], p.Case[1] = p.Case[1], p.Case[0]
+		}
+	}
 	return
 }
 
@@ -117,7 +118,11 @@ func (p *Puzzle) PrintPuzzle(size int) {
 	u := p.Case
 	for y := 0; y < size; y++ {
 		for x := 0; x < size; x++ {
-			fmt.Printf("%*d ", len([]byte(string(size*size))), u[y+x*size])
+			if u[y+x*size] == 0 {
+				color.New(color.FgRed).Printf("%*d ", len(strconv.Itoa(size*size))+1, u[y+x*size])
+			} else {
+				fmt.Printf("%*d ", len(strconv.Itoa(size*size))+1, u[y+x*size])
+			}
 		}
 		fmt.Printf("\n")
 	}
