@@ -119,9 +119,9 @@ func (p *Puzzle) PrintPuzzle() {
 	for y := 0; y < p.Size; y++ {
 		for x := 0; x < p.Size; x++ {
 			if u[y+x*p.Size] == 0 {
-				color.New(color.FgRed).Printf("|%*d| ", len(strconv.Itoa(p.Size*p.Size))+1, u[y+x*p.Size])
+				color.New(color.FgRed).Printf("|%*d| ", len(strconv.Itoa(p.Size*p.Size))+1, u[x+y*p.Size])
 			} else {
-				fmt.Printf("|%*d| ", len(strconv.Itoa(p.Size*p.Size))+1, u[y+x*p.Size])
+				fmt.Printf("|%*d| ", len(strconv.Itoa(p.Size*p.Size))+1, u[x+y*p.Size])
 			}
 		}
 		fmt.Printf("\n")
