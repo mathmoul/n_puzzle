@@ -114,14 +114,14 @@ func (p *Puzzle) SwapEmpty() (err error) {
 }
 
 // PrintPuzzle function
-func (p *Puzzle) PrintPuzzle(size int) {
+func (p *Puzzle) PrintPuzzle() {
 	u := p.Case
-	for y := 0; y < size; y++ {
-		for x := 0; x < size; x++ {
-			if u[y+x*size] == 0 {
-				color.New(color.FgRed).Printf("%*d ", len(strconv.Itoa(size*size))+1, u[y+x*size])
+	for y := 0; y < p.Size; y++ {
+		for x := 0; x < p.Size; x++ {
+			if u[y+x*p.Size] == 0 {
+				color.New(color.FgRed).Printf("|%*d| ", len(strconv.Itoa(p.Size*p.Size))+1, u[y+x*p.Size])
 			} else {
-				fmt.Printf("%*d ", len(strconv.Itoa(size*size))+1, u[y+x*size])
+				fmt.Printf("|%*d| ", len(strconv.Itoa(p.Size*p.Size))+1, u[y+x*p.Size])
 			}
 		}
 		fmt.Printf("\n")
