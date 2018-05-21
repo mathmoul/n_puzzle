@@ -5,3 +5,6 @@ all:
 	go build main.go
 
 $(NAME): all
+
+run: all
+	./main
