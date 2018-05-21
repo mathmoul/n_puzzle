@@ -1,0 +1,5 @@
+package heuristic
+
+func Misplaced() {
+
+}
