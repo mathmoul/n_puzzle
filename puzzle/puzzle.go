@@ -2,28 +2,36 @@ package puzzle
 
 import (
 	"crypto/rand"
+	"errors"
 	"fmt"
 	"log"
 	"math/big"
-	"os"
 	"strconv"
 
 	"github.com/fatih/color"
 )
 
+// TileIndex struct
+type TileIndex struct {
+	I int
+}
+
 // Puzzle struct
 type Puzzle struct {
+	Zero TileIndex
 	Case []int
 	Size int
 }
 
-func (p *Puzzle) zeroIndex() int {
+// ZeroIndex func
+func (p *Puzzle) ZeroIndex() (err error) {
 	for i := range p.Case {
 		if p.Case[i] == 0 {
-			return i
+			p.Zero.I = i
+			return
 		}
 	}
-	return -1
+	return errors.New("No tile '0'")
 }
 
 // Init create new puzzle instance
@@ -86,29 +94,28 @@ func MakePuzzle(size int, solvable bool, iterations uint) (p *Puzzle, err error)
 
 // SwapEmpty function swap empty
 func (p *Puzzle) SwapEmpty() (err error) {
-	idx := p.zeroIndex()
-	if idx < 0 {
-		os.Exit(0)
+	if err = p.ZeroIndex(); err != nil {
+		log.Fatal(err)
 	}
 	poss := make([]int, 0)
-	if (idx % p.Size) > 0 {
-		poss = append(poss, idx-1)
+	if (p.Zero.I % p.Size) > 0 {
+		poss = append(poss, p.Zero.I-1)
 	}
-	if (idx % p.Size) < (p.Size - 1) {
-		poss = append(poss, idx+1)
+	if (p.Zero.I % p.Size) < (p.Size - 1) {
+		poss = append(poss, p.Zero.I+1)
 	}
-	if (idx / p.Size) > 0 {
-		poss = append(poss, idx-p.Size)
+	if (p.Zero.I / p.Size) > 0 {
+		poss = append(poss, p.Zero.I-p.Size)
 	}
-	if (idx / p.Size) < (p.Size - 1) {
-		poss = append(poss, idx+p.Size)
+	if (p.Zero.I / p.Size) < (p.Size - 1) {
+		poss = append(poss, p.Zero.I+p.Size)
 	}
 	n, err := rand.Int(rand.Reader, big.NewInt(int64(len(poss))))
 	if err != nil {
 		log.Fatal(err)
 	}
 	swi := poss[n.Int64()]
-	p.Case[idx] = p.Case[swi]
+	p.Case[p.Zero.I] = p.Case[swi]
 	p.Case[swi] = 0
 	return
 }
