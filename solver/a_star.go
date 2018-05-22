@@ -20,14 +20,13 @@ type Astar struct {
 	Heuristic  func() int
 }
 
-
-func NewAstar(p npuzzle.Puzzle, h uint) (*Astar) {
+func NewAstar(p npuzzle.Puzzle, h uint) *Astar {
 	return &Astar{
-		Puzzle: p,
-		Goal: npuzzle.Goal(p.Size),
-		OpenList: []List{},
+		Puzzle:     p,
+		Goal:       npuzzle.Goal(p.Size),
+		OpenList:   []List{},
 		ClosedList: []List{},
-		Heuristic: nil,
+		Heuristic:  nil,
 	}
 }
 
@@ -35,9 +34,9 @@ type IAstar interface {
 	ManhattanHeuristic() (ret int, err error)
 	LinearHeuristic() (ret int, err error)
 	MisplacedHeuristic() (ret int, err error)
-
 }
-func (a *Astar)FindHeuristic(h uint) {
+
+func (a *Astar) FindHeuristic(h uint) {
 	switch h {
 	case Manhattan:
 		a.ManhattanHeuristic()

@@ -3,6 +3,7 @@ package main
 import (
 	"N_Puzzle/flags"
 	"N_Puzzle/npuzzle"
+	"N_Puzzle/solver"
 	"log"
 )
 
@@ -24,4 +25,5 @@ func main() {
 		}
 	}
 	p.PrintPuzzle()
+	solver.Start(p, flags.Heuristic)
 }

@@ -1,9 +1,14 @@
 package solver
 
-import "N_Puzzle/npuzzle"
+import (
+	"N_Puzzle/npuzzle"
+	"fmt"
+)
 
-func Start(p npuzzle.Puzzle /* + Heuristic */) {
-	a := NewAstar(p)
+// Start function
+func Start(p npuzzle.Puzzle, h uint) {
+	a := NewAstar(p, h)
+	fmt.Println(a)
 	// TODO heuristic between answer and puzzle
 	//d.Answer.PrintPuzzle()
 }
