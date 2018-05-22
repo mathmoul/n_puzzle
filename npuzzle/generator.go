@@ -120,3 +120,9 @@ func Generate() (p Puzzle, err error) {
 	p = *tmp
 	return
 }
+
+func Goal(size int) Puzzle {
+	tmp := initPuzzle(size)
+	tmp.makeGoals()
+	return *tmp
+}
