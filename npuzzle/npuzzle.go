@@ -5,9 +5,11 @@ type TileIndex struct {
 	I int
 }
 
+type Board []int
+
 // Puzzle struct
 type Puzzle struct {
 	Zero TileIndex
-	Case []int
+	Board
 	Size int
 }

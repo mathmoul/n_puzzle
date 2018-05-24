@@ -10,7 +10,7 @@ import (
 )
 
 func (p *Puzzle) makeGoals() {
-	u := p.Case
+	u := p.Board
 	s := p.Size
 	cur, ix := 1, 1
 	x, y, iy := 0, 0, 0
@@ -33,16 +33,16 @@ func (p *Puzzle) makeGoals() {
 			cur = 0
 		}
 	}
-	p.Case = u
+	p.Board = u
 }
 
 func initPuzzle(size int) *Puzzle {
 	var u = &Puzzle{
 		Size: size,
-		Case: make([]int, size*size),
+		Board: make([]int, size*size),
 	}
-	for i := range u.Case {
-		u.Case[i] = -1
+	for i := range u.Board {
+		u.Board[i] = -1
 	}
 	return u
 }
@@ -69,8 +69,8 @@ func (p *Puzzle) swapEmpty() (err error) {
 		log.Fatal(err)
 	}
 	swi := poss[n.Int64()]
-	p.Case[p.Zero.I] = p.Case[swi]
-	p.Case[swi] = 0
+	p.Board[p.Zero.I] = p.Board[swi]
+	p.Board[swi] = 0
 	return
 }
 
@@ -82,10 +82,10 @@ func (p *Puzzle) makePuzzle(solvable bool, iterations uint) (err error) {
 		}
 	}
 	if !solvable {
-		if p.Case[0] == 0 || p.Case[1] == 0 {
-			p.Case[len(p.Case)-1], p.Case[len(p.Case)-2] = p.Case[len(p.Case)-2], p.Case[len(p.Case)-1]
+		if p.Board[0] == 0 || p.Board[1] == 0 {
+			p.Board[len(p.Board)-1], p.Board[len(p.Board)-2] = p.Board[len(p.Board)-2], p.Board[len(p.Board)-1]
 		} else {
-			p.Case[0], p.Case[1] = p.Case[1], p.Case[0]
+			p.Board[0], p.Board[1] = p.Board[1], p.Board[0]
 		}
 	}
 	return
@@ -93,8 +93,8 @@ func (p *Puzzle) makePuzzle(solvable bool, iterations uint) (err error) {
 
 // ZeroIndex func
 func (p *Puzzle) zeroIndex() (err error) {
-	for i := range p.Case {
-		if p.Case[i] == 0 {
+	for i := range p.Board {
+		if p.Board[i] == 0 {
 			p.Zero.I = i
 			return
 		}
@@ -124,5 +124,6 @@ func Generate() (p Puzzle, err error) {
 func Goal(size int) Puzzle {
 	tmp := initPuzzle(size)
 	tmp.makeGoals()
+	tmp.zeroIndex()
 	return *tmp
 }

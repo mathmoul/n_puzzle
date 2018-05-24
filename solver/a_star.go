@@ -1,63 +1,50 @@
 package solver
 
-import "N_Puzzle/npuzzle"
+import (
+	"N_Puzzle/npuzzle"
+	"container/list"
+	"fmt"
+)
 
 type List struct {
+	npuzzle.Puzzle
+	Next *list.List
 }
-
-const (
-	Manhattan = iota
-	Linear
-	Misplaced
-	Pattern
-)
 
 type Astar struct {
 	npuzzle.Puzzle
 	Goal       npuzzle.Puzzle
-	OpenList   []List
-	ClosedList []List
-	Heuristic  func() int
-}
-
-func NewAstar(p npuzzle.Puzzle, h uint) *Astar {
-	return &Astar{
-		Puzzle:     p,
-		Goal:       npuzzle.Goal(p.Size),
-		OpenList:   []List{},
-		ClosedList: []List{},
-		Heuristic:  nil,
-	}
+	OpenList   *list.List
+	ClosedList *list.List
+	Turns      uint
+	HeuristicFunction
 }
 
 type IAstar interface {
 	ManhattanHeuristic() (ret int, err error)
 	LinearHeuristic() (ret int, err error)
 	MisplacedHeuristic() (ret int, err error)
+
+	Run() (err error)
+
+	RootNode(action int, parent *Node) (err error)
+
+	PrintResult() (err error)
+
+	S()
 }
 
-func (a *Astar) FindHeuristic(h uint) {
-	switch h {
-	case Manhattan:
-		a.ManhattanHeuristic()
-		break
-	case Linear:
-		a.LinearHeuristic()
-		break
-	case Misplaced:
-		a.MisplacedHeuristic()
-		break
+func NewAstar(p npuzzle.Puzzle, h uint) *Astar {
+	return &Astar{
+		Puzzle:            p,
+		Goal:              npuzzle.Goal(p.Size),
+		OpenList:          list.New(),
+		ClosedList:        list.New(),
+		HeuristicFunction: FindHeuristic(h),
+		Turns:             0,
 	}
 }
 
-func (a *Astar) ManhattanHeuristic() (ret int) {
-	return
-}
-
-func (a *Astar) LinearHeuristic() (ret int) {
-	return 0
-}
-
-func (a *Astar) MisplacedHeuristic() (ret int) {
-	return
+func (a *Astar) S() {
+	fmt.Println("A* =>", a)
 }

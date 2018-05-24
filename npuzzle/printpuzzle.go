@@ -9,7 +9,7 @@ import (
 
 // PrintPuzzle function
 func (p *Puzzle) PrintPuzzle() {
-	u := p.Case
+	u := p.Board
 	for y := 0; y < p.Size; y++ {
 		for x := 0; x < p.Size; x++ {
 			if u[x+y*p.Size] == 0 {
@@ -20,8 +20,4 @@ func (p *Puzzle) PrintPuzzle() {
 		}
 		fmt.Printf("\n")
 	}
-}
-
-func a () {
-  
 }
