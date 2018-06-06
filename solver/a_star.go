@@ -32,6 +32,12 @@ type IAstar interface {
 	PrintResult() (err error)
 
 	S()
+
+	Done() bool
+}
+
+func (a *Astar) Done() bool {
+	return false
 }
 
 func NewAstar(p npuzzle.Puzzle, h uint) *Astar {

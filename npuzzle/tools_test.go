@@ -1,1 +1,0 @@
-package npuzzle_test

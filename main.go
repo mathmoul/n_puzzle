@@ -3,8 +3,9 @@ package main
 import (
 	"N_Puzzle/flags"
 	"N_Puzzle/npuzzle"
-	"N_Puzzle/solver"
 	"log"
+	"fmt"
+	"N_Puzzle/solver"
 )
 
 func main() {
@@ -19,11 +20,14 @@ func main() {
 			log.Fatal(err)
 		}
 	} else {
-		p, err = npuzzle.ParseArgs(flags.Args)
-		if err != nil {
-			log.Fatal(err)
-		}
+		//p, err = npuzzle.ParseArgs(flags.Args)
+		//if err != nil {
+		//	log.Fatal(err)
+		//}
+		fmt.Println("TODO handle file reading")
+		return
 	}
 	p.PrintPuzzle()
-	solver.Start(p, flags.Heuristic)
+	fmt.Println(p)
+	solver.Start(p, flags.Heuristic-1)
 }

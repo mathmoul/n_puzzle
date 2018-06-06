@@ -12,4 +12,5 @@ type Puzzle struct {
 	Zero TileIndex
 	Board
 	Size int
+	Tiles
 }
