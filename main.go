@@ -27,7 +27,9 @@ func main() {
 		fmt.Println("TODO handle file reading")
 		return
 	}
+	fmt.Printf("Puzzle =>")
 	p.PrintPuzzle()
-	fmt.Println(p)
+	fmt.Println()
+	//fmt.Println(p)
 	solver.Start(p, flags.Heuristic-1)
 }

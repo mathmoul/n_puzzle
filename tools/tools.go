@@ -35,6 +35,6 @@ func CloneValues(source interface{}, dest interface{}) {
 		starY.Set(starX)
 		reflect.ValueOf(dest).Elem().Set(y.Elem())
 	} else {
-		dest = x.Interface()
+		reflect.ValueOf(dest).Elem().Set(x)
 	}
 }

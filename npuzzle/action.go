@@ -4,48 +4,46 @@ import (
 	"N_Puzzle/actions"
 )
 
-func (p *Puzzle) Move(action actions.Action) (a *Puzzle) {
-	a = p
+func (p *Puzzle) Move(action actions.Action) {
 	switch action.Value {
 	case actions.Top:
-		a.MoveTop()
+		p.Board.MoveTop(p.Zero.I)
 		break
 	case actions.Bot:
-		a.MoveBot()
+		p.Board.MoveBot(p.Zero.I)
 		break
 	case actions.Left:
-		a.MoveLeft()
+		p.MoveLeft(p.Zero.I)
 		break
 	case actions.Right:
-		a.MoveRight()
+		p.MoveRight(p.Zero.I)
 		break
 	}
 
-	a.zeroIndex()
-	a.TabTiles()
-	return
+	p.zeroIndex()
+	p.TabTiles()
 }
 
-func (p *Puzzle) MoveTop() {
-	tmp := p.Board[p.Zero.I-3]
-	p.Board[p.Zero.I-3] = 0
-	p.Board[p.Zero.I] = tmp
+func (b Board) MoveTop(i int) {
+	tmp := b[i-3]
+	b[i-3] = 0
+	b[i] = tmp
 }
 
-func (p *Puzzle) MoveBot() {
-	tmp := p.Board[p.Zero.I+3]
-	p.Board[p.Zero.I+3] = 0
-	p.Board[p.Zero.I] = tmp
+func (b Board) MoveBot(i int) {
+	tmp := b[i+3]
+	b[i+3] = 0
+	b[i] = tmp
 }
 
-func (p *Puzzle) MoveLeft() {
-	tmp := p.Board[p.Zero.I-1]
-	p.Board[p.Zero.I-1] = 0
-	p.Board[p.Zero.I] = tmp
+func (b Board) MoveLeft(i int) {
+	tmp := b[i-1]
+	b[i-1] = 0
+	b[i] = tmp
 }
 
-func (p *Puzzle) MoveRight() {
-	tmp := p.Board[p.Zero.I+1]
-	p.Board[p.Zero.I+1] = 0
-	p.Board[p.Zero.I] = tmp
+func (b Board) MoveRight(i int) {
+	tmp := b[i+1]
+	b[i+1] = 0
+	b[i] = tmp
 }

@@ -36,7 +36,7 @@ func (p *Puzzle) makeGoals() {
 
 func initPuzzle(size int) *Puzzle {
 	var u = &Puzzle{
-		Size: size,
+		Size:  size,
 		Board: make([]int, size*size),
 		Tiles: make([]Tile, size*size),
 	}
@@ -120,7 +120,7 @@ func Generate() (p Puzzle, err error) {
 	//p = *tmp
 	//return
 	np := &Puzzle{
-		Board: Board{5, 4, 6, 2, 7, 3, 8, 1, 0},
+		Board: Board{1, 2, 3, 8, 4, 7, 0, 6, 5},
 		Size:3,
 		Tiles: make([]Tile, 9),
 	}
@@ -137,7 +137,7 @@ func Tiling(size int, pos int) (t Tile) {
 }
 
 func (p *Puzzle) TabTiles() {
-	for i := 0; i < p.Size * p .Size; i++ {
+	for i := 0; i < p.Size*p.Size; i++ {
 		p.Tiles[p.Board[i]] = Tiling(p.Size, i)
 	}
 }
@@ -146,6 +146,6 @@ func Goal(size int) Puzzle {
 	tmp := initPuzzle(size)
 	tmp.makeGoals()
 	tmp.zeroIndex()
-	go tmp.TabTiles()
+	tmp.TabTiles()
 	return *tmp
 }
