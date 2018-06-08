@@ -13,8 +13,9 @@ type Flags struct {
 	Size       int
 	Solvable   bool
 	Iterations uint
+	Cost       uint
 	Args       []string
-	Heuristic	uint
+	Heuristic  uint
 }
 
 var t = [2]bool{
@@ -34,6 +35,7 @@ func Parse() (f Flags, err error) {
 	flag.UintVar(&f.Iterations, "iterations", 10000, "Number of iterations.")
 	flag.UintVar(&f.Heuristic, "h", 1,
 		"Forces heuristic, must be between 1 to 4\n\t1 = mahnattan \n\t2 = linear \n\t3 = missplaced \n\t4 = pattern \n")
+	flag.UintVar(&f.Cost, "c", 1, "Choose cost, must be between 1 to 3\n\t1 = Only Heuristic (faster)\n\t2 = Greedy search (average)\n\t3 = Uniform search (slower)\n")
 	flag.Parse()
 	f.Args = flag.Args()
 	if f.Solvable && unsolv {
@@ -49,6 +51,9 @@ func Parse() (f Flags, err error) {
 	}
 	if f.Heuristic < 1 || f.Heuristic > 4 {
 		log.Fatal("Wrong heuristic")
+	}
+	if f.Cost < 1 || f.Cost > 3 {
+		log.Fatal("Wrong cost")
 	}
 	if f.Size < 3 {
 		log.Fatal("Size cant be lower than 3")

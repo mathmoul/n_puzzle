@@ -5,6 +5,7 @@ import (
 	"N_Puzzle/npuzzle"
 	"log"
 	"fmt"
+	"container/list"
 )
 
 type Node struct {
@@ -29,7 +30,28 @@ func NewNode(action actions.Action, g int, h int, parent *Node, state npuzzle.Pu
 	}
 }
 
-func (n *Node) Execute(a *Astar) (ret []*Node) {
+func BoardsEqual(new npuzzle.Board, old npuzzle.Board) bool {
+	if len(new) == len(old) {
+		for i := 0; i < len(old); i++ {
+			if int(new[i]) != int(old[i]) {
+				return false
+			}
+		}
+		return true
+	}
+	return false
+}
+
+func (n *Node) AlreadyClosed(closedList *list.List) bool {
+	for e := closedList.Front(); e != nil; e = e.Next() {
+		if BoardsEqual(n.State.Board, e.Value.(*Node).State.Board) {
+			return true
+		}
+	}
+	return false
+}
+
+func (n *Node) Execute(a *Astar) {
 	for _, b := range actions.L {
 		if n.State.Zero.ToTile(n.State.Size).TestAction(b.Value, n.State.Size) {
 			var y = n.State.Copy()
@@ -38,8 +60,35 @@ func (n *Node) Execute(a *Astar) (ret []*Node) {
 			if err != nil {
 				log.Fatal(err)
 			}
-			ret = append(ret, NewNode(b, n.G+1, h, n, *y))
-			// TODO if newNode is in a.ClosedState dont add it dont do for greedy search
+			newNode := NewNode(b, n.G+1, h, n, *y)
+			if !newNode.AlreadyClosed(a.ClosedList) {
+				OpenListLowerCost(a.OpenList, newNode)
+			}
+		}
+	}
+	return
+}
+
+func OpenListLowerCost(l *list.List, newnode *Node) {
+	for e := l.Front(); e != nil; e = e.Next() {
+		v := e.Value.(*Node)
+		if BoardsEqual(v.State.Board, newnode.State.Board) {
+			if newnode.G < v.G {
+				l.Remove(e)
+			} else {
+				return
+			}
+		}
+	}
+	l.PushBack(newnode)
+}
+
+func TestNodes(ol *list.List, cl *list.List) (cpt int) {
+	for c := cl.Front(); c != nil; c = c.Next() {
+		for o := ol.Front(); o != nil; o = o.Next() {
+			if BoardsEqual(c.Value.(*Node).State.Board, o.Value.(*Node).State.Board) {
+				cpt++
+			}
 		}
 	}
 	return
@@ -51,9 +100,8 @@ func (n *Node) PrintNode() {
 }
 
 func (n *Node) PrintResult() {
-	for n != nil {
-		//fmt.Println(y)
-		defer n.PrintNode()
-		n = n.Parent
+	if n != nil {
+		n.Parent.PrintResult()
+		n.PrintNode()
 	}
 }

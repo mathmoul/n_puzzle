@@ -4,17 +4,19 @@ import (
 	"N_Puzzle/actions"
 	"N_Puzzle/npuzzle"
 	"log"
+	"container/list"
+	"fmt"
 )
 
 // Start function
-func Start(p npuzzle.Puzzle, h uint) {
+func Start(p npuzzle.Puzzle, h uint, c uint) {
 	a := NewAstar(p, h)
-	if n, err := a.Run(); err != nil {
+	if n, err := a.Run(SortSwitch(c)); err != nil {
 		log.Fatal(err)
 	} else {
-		n.PrintResult()
+		//n.PrintResult()
+		fmt.Println(n.G)
 	}
-	// TODO heuristic between answer and puzzle
 	//d.Answer.PrintPuzzle()
 }
 
@@ -22,8 +24,9 @@ const (
 	No = iota
 )
 
-func (a *Astar) Run() (q *Node, err error) {
-	//fmt.Printf("%+v\n", a)
+func (a *Astar) Run(FCost SortList) (q *Node, err error) {
+	a.Goal.PrintPuzzle()
+	fmt.Printf("%+v\n", a.Goal)
 	if err = a.RootNode(No); err != nil {
 		return
 	}
@@ -32,30 +35,23 @@ func (a *Astar) Run() (q *Node, err error) {
 	//}
 	for a.OpenList.Len() > 0 {
 		for e := a.OpenList.Front(); e != nil; e = e.Next() {
+			a.OpenList.Remove(e)
 			a.Turns += 1
 			c := e.Value
-			nodes := c.(*Node).Execute(a)
+			c.(*Node).Execute(a)
+			if uint(a.OpenList.Len()) > a.MaxState {
+				a.MaxState = uint(a.OpenList.Len())
+			}
 			if c.(*Node).H == 0 {
-				//c.(*Node).State.PrintPuzzle()
+				fmt.Println("turns", a.Turns)
+				fmt.Println(a.MaxState)
 				return c.(*Node), nil
 			}
-			for _, n := range nodes {
-				a.OpenList.PushBack(n)
-			}
 			a.ClosedList.PushBack(c)
-			a.OpenList.Remove(e)
-			//tools.PrintList(a.OpenList)
-			//fmt.Println()
-			//tools.PrintList(a.ClosedList)
-			//if a.Done() {
-			//	return nil
-			//}
-
-			//if a.Turns > 0 {
-			//	return
-			//}
+			FCost(&a.OpenList)
 		}
 	}
+	fmt.Println("turns", a.Turns)
 	return
 }
 
@@ -73,4 +69,10 @@ func (a *Astar) RootNode(action int) (err error) {
 		nil,
 		a.Puzzle))
 	return
+}
+
+func PrintListH(l *list.List) {
+	for e := l.Front(); e != nil; e = e.Next() {
+		fmt.Println("G => ", e.Value.(*Node).H)
+	}
 }

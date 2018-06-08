@@ -17,6 +17,7 @@ type Astar struct {
 	OpenList   *list.List
 	ClosedList *list.List
 	Turns      uint
+	MaxState   uint
 	HeuristicFunction
 }
 
@@ -48,6 +49,7 @@ func NewAstar(p npuzzle.Puzzle, h uint) *Astar {
 		ClosedList:        list.New(),
 		HeuristicFunction: FindHeuristic(h),
 		Turns:             0,
+		MaxState:          0,
 	}
 }
 

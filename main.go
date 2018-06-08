@@ -31,5 +31,5 @@ func main() {
 	p.PrintPuzzle()
 	fmt.Println()
 	//fmt.Println(p)
-	solver.Start(p, flags.Heuristic-1)
+	solver.Start(p, flags.Heuristic-1, flags.Cost)
 }

@@ -53,10 +53,25 @@ func ManhattanHeuristic() HeuristicFunction {
 	})
 }
 
+func VerticalConflict(current, final npuzzle.Tile) (conflicts int) {
+
+}
+
 func LinearHeuristic() HeuristicFunction {
-	return HeuristicFunction(func(board npuzzle.Puzzle, dt npuzzle.Puzzle) (ret int, err error) {
-		for i, b := range board.Tiles {
-			fmt.Println(i, b)
+	return HeuristicFunction(func(board npuzzle.Puzzle, final npuzzle.Puzzle) (ret int, err error) {
+		ret = 0
+		if len(board.Tiles) != len(final.Tiles) {
+			return 0, errors.New("les tableaux de tiles ne sont pas de la meme taille")
+		}
+		for i := range board.Tiles {
+			current := board.Tiles[i]
+			final := final.Tiles[i]
+			if current.X != final.X {
+				ret += tools.Abs(current.X - final.X)
+			} else {
+				ret += VerticalConflict(current, final)
+			}
+			ret += tools.Abs(current.Y - final.Y)
 		}
 		return
 	})

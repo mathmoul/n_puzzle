@@ -5,6 +5,8 @@ import (
 	"errors"
 	"log"
 	"math/big"
+	"N_Puzzle/flags"
+	"fmt"
 )
 
 func (p *Puzzle) makeGoals() {
@@ -103,31 +105,31 @@ func (p *Puzzle) zeroIndex() (err error) {
 
 // Generate function
 func Generate() (p Puzzle, err error) {
-	//flags := flags.Get()
-	//if flags.Solvable {
-	//	fmt.Println("This puzzle is sovlable")
-	//} else {
-	//	fmt.Println("This puzzle is unsolvable")
-	//}
-	//tmp := initPuzzle(flags.Size)
-	//if err = tmp.makePuzzle(flags.Solvable, flags.Iterations); err != nil {
-	//	return
-	//}
-	//if err = tmp.zeroIndex(); err != nil {
-	//	return
-	//}
-	//go tmp.TabTiles()
-	//p = *tmp
-	//return
-	np := &Puzzle{
-		Board: Board{1, 2, 3, 8, 4, 7, 0, 6, 5},
-		Size:3,
-		Tiles: make([]Tile, 9),
+	flags := flags.Get()
+	if flags.Solvable {
+		fmt.Println("This puzzle is sovlable")
+	} else {
+		fmt.Println("This puzzle is unsolvable")
 	}
-	np.zeroIndex()
-	np.TabTiles()
-	p = *np
-	return p, nil
+	tmp := initPuzzle(flags.Size)
+	if err = tmp.makePuzzle(flags.Solvable, flags.Iterations); err != nil {
+		return
+	}
+	if err = tmp.zeroIndex(); err != nil {
+		return
+	}
+	go tmp.TabTiles()
+	p = *tmp
+	return
+	//np := &Puzzle{
+	//	Board: Board{1, 2, 3, 8, 4, 7, 0, 6, 5},
+	//	Size:3,
+	//	Tiles: make([]Tile, 9),
+	//}
+	//np.zeroIndex()
+	//np.TabTiles()
+	//p = *np
+	//return p, nil
 }
 
 func Tiling(size int, pos int) (t Tile) {
