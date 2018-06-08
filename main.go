@@ -5,7 +5,7 @@ import (
 	"N_Puzzle/npuzzle"
 	"log"
 	"fmt"
-	"N_Puzzle/solver"
+	"N_Puzzle/parser"
 )
 
 func main() {
@@ -20,16 +20,15 @@ func main() {
 			log.Fatal(err)
 		}
 	} else {
-		//p, err = npuzzle.ParseArgs(flags.Args)
-		//if err != nil {
-		//	log.Fatal(err)
-		//}
-		fmt.Println("TODO handle file reading")
-		return
+		_, err := parser.File(flags.Args)
+		if err != nil {
+			log.Fatal(err)
+		}
+		//p = *u
 	}
 	fmt.Printf("Puzzle =>")
 	p.PrintPuzzle()
 	fmt.Println()
 	//fmt.Println(p)
-	solver.Start(p, flags.Heuristic-1, flags.Cost)
+	//solver.Start(p, flags.Heuristic-1, flags.Cost)
 }
