@@ -11,6 +11,9 @@ import (
 // Start function
 func Start(p npuzzle.Puzzle, h uint, c uint) {
 	a := NewAstar(p, h)
+	if !a.CheckSolvability() {
+		log.Fatal("This puzzle is unsolvable")
+	}
 	if n, err := a.Run(SortSwitch(c)); err != nil {
 		log.Fatal(err)
 	} else {

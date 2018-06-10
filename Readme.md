@@ -1,4 +1,4 @@
-- [ ] Parser
+- [x] Parser
 - [ ] Check unsolvability / solvability
 - [ ] Goroutines
 - [ ] cleanup code
