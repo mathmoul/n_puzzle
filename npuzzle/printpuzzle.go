@@ -20,5 +20,4 @@ func (p *Puzzle) PrintPuzzle() {
 		}
 		fmt.Printf("\n")
 	}
-	//fmt.Println(p)
 }

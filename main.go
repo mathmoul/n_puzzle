@@ -4,31 +4,27 @@ import (
 	"N_Puzzle/flags"
 	"N_Puzzle/npuzzle"
 	"log"
-	"fmt"
 	"N_Puzzle/parser"
+	"N_Puzzle/solver"
 )
 
 func main() {
 	var p npuzzle.Puzzle
-	flags, err := flags.Parse()
+	f, err := flags.Parse()
 	if err != nil {
 		log.Fatal(err)
 	}
-	if len(flags.Args) == 0 {
+	if len(f.Args) == 0 {
 		p, err = npuzzle.Generate()
 		if err != nil {
 			log.Fatal(err)
 		}
 	} else {
-		_, err := parser.File(flags.Args)
+		u, err := parser.File(f.Args)
 		if err != nil {
 			log.Fatal(err)
 		}
-		//p = *u
+		p = *u
 	}
-	fmt.Printf("Puzzle =>")
-	p.PrintPuzzle()
-	fmt.Println()
-	//fmt.Println(p)
-	//solver.Start(p, flags.Heuristic-1, flags.Cost)
+	solver.Start(p, f.Heuristic-1, f.Cost)
 }

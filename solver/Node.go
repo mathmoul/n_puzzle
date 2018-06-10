@@ -4,7 +4,6 @@ import (
 	"N_Puzzle/actions"
 	"N_Puzzle/npuzzle"
 	"log"
-	"fmt"
 	"container/list"
 )
 
@@ -95,7 +94,6 @@ func TestNodes(ol *list.List, cl *list.List) (cpt int) {
 }
 
 func (n *Node) PrintNode() {
-	fmt.Println(n.G, " ", n.H)
 	n.State.PrintPuzzle()
 }
 

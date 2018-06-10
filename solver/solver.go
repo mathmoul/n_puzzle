@@ -14,8 +14,7 @@ func Start(p npuzzle.Puzzle, h uint, c uint) {
 	if n, err := a.Run(SortSwitch(c)); err != nil {
 		log.Fatal(err)
 	} else {
-		//n.PrintResult()
-		fmt.Println(n.G)
+		n.PrintResult()
 	}
 	//d.Answer.PrintPuzzle()
 }
@@ -25,8 +24,6 @@ const (
 )
 
 func (a *Astar) Run(FCost SortList) (q *Node, err error) {
-	a.Goal.PrintPuzzle()
-	fmt.Printf("%+v\n", a.Goal)
 	if err = a.RootNode(No); err != nil {
 		return
 	}
@@ -59,6 +56,7 @@ func (a *Astar) RootNode(action int) (err error) {
 	var h int
 	currentState := a.Puzzle
 	h, err = a.HeuristicFunction(currentState, a.Goal)
+	fmt.Println(h)
 	if err != nil {
 		return
 	}
