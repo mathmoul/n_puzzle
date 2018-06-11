@@ -11,11 +11,13 @@ type List struct {
 	Next *list.List
 }
 
+type Nodes []*Node
+
 type Astar struct {
 	npuzzle.Puzzle
 	Goal       npuzzle.Puzzle
-	OpenList   *list.List
-	ClosedList *list.List
+	OpenList   Nodes
+	ClosedList Nodes
 	Turns      uint
 	MaxState   uint
 	HeuristicFunction
@@ -45,8 +47,8 @@ func NewAstar(p npuzzle.Puzzle, h uint) *Astar {
 	return &Astar{
 		Puzzle:            p,
 		Goal:              npuzzle.Goal(p.Size),
-		OpenList:          list.New(),
-		ClosedList:        list.New(),
+		OpenList:          []*Node{},
+		ClosedList:        []*Node{},
 		HeuristicFunction: FindHeuristic(h),
 		Turns:             0,
 		MaxState:          0,

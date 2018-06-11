@@ -34,7 +34,7 @@ func Parse() (f Flags, err error) {
 	flag.UintVar(&f.Iterations, "iterations", 10000, "Number of iterations.")
 	flag.UintVar(&f.Heuristic, "heu", 1,
 		"Forces heuristic, must be between 1 to 3\n\t1 = mahnattan \n\t2 = linear \n\t3 = missplaced \n")
-	flag.UintVar(&f.Cost, "c", 1, "Choose cost, must be between 1 to 3\n\t1 = Only Heuristic (faster)\n\t2 = Greedy search (average)\n\t3 = Uniform search (slower)\n")
+	flag.UintVar(&f.Cost, "c", 2, "Choose cost, must be between 1 to 3\n\t1 = Only Heuristic (faster)\n\t2 = Greedy search (average)\n\t3 = Uniform search (slower)\n")
 	flag.Parse()
 	f.Args = flag.Args()
 	f.Solvable = !unsolv

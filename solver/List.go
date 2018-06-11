@@ -1,44 +1,39 @@
 package solver
 
-import "container/list"
+import (
+	"sort"
+)
 
-type SortList func(l **list.List)
-
-func SortH(l **list.List) {
-	ll := *l
-	for e := ll.Front(); e != nil; e = e.Next() {
-		if e.Next() != nil {
-			if e.Value.(*Node).H > e.Next().Value.(*Node).H {
-				ll.MoveAfter(e, e.Next())
-				SortH(l)
-			}
-		}
-	}
+type H struct {
+	Nodes
 }
 
-func SortGreedy(l **list.List) {
-	ll := *l
-	for e := ll.Front(); e != nil; e = e.Next() {
-		if e.Next() != nil {
-			if e.Value.(*Node).H+e.Value.(*Node).G >
-				e.Next().Value.(*Node).H+e.Next().Value.(*Node).G {
-				ll.MoveAfter(e, e.Next())
-				SortGreedy(l)
-			}
-		}
-	}
+func (h H) Less(i, j int) bool {
+	return h[i].H < h[j].H
 }
 
-func SortUniform(l **list.List) {
-	ll := *l
-	for e := ll.Front(); e != nil; e = e.Next() {
-		if e.Next() != nil {
-			if e.Value.(*Node).G > e.Next().Value.(*Node).G {
-				ll.MoveAfter(e, e.Next())
-				SortUniform(l)
-			}
-		}
-	}
+type SortList func([]*Node)
+
+func (n Nodes) Len() int               { return len(n) }
+func (n Nodes) Swap(i, j int)          { n[i], n[j] = n[j], n[i] }
+func (n Nodes) Less(i, j int) bool     { return n[i].H < n[j].H }
+func (n Nodes) LessG(i, j int) bool    { return n[i].G < n[j].G }
+func (n Nodes) LessSomm(i, j int) bool { return n[i].Somm < n[j].Somm }
+
+func SortH(n []*Node) {
+	sort.Sort(H(Nodes(n)))
+}
+
+func SortGreedy(n []Node) {
+	sort.SliceStable(n, func(i, j int) bool {
+		return n[i].Somm < n[j].Somm
+	})
+}
+
+func SortUniform(n []Node) {
+	sort.SliceStable(n, func(i, j int) bool {
+		return n[i].G < n[j].G
+	})
 }
 
 func SortSwitch(cost uint) SortList {

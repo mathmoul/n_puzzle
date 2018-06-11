@@ -4,7 +4,6 @@ import (
 	"N_Puzzle/actions"
 	"N_Puzzle/npuzzle"
 	"log"
-	"container/list"
 	"fmt"
 )
 
@@ -14,10 +13,13 @@ func Start(p npuzzle.Puzzle, h uint, c uint) {
 	if !a.CheckSolvability() {
 		log.Fatal("This puzzle is unsolvable")
 	}
+	fmt.Println("Searching solution...")
 	if n, err := a.Run(SortSwitch(c)); err != nil {
 		log.Fatal(err)
 	} else {
 		n.PrintResult()
+		fmt.Println("Number of turns:", a.Turns)
+		fmt.Println("Max state:", a.MaxState)
 	}
 	//d.Answer.PrintPuzzle()
 }
@@ -30,25 +32,19 @@ func (a *Astar) Run(FCost SortList) (q *Node, err error) {
 	if err = a.RootNode(No); err != nil {
 		return
 	}
-	//if a.OpenList.Back().Value.(*Node).H == 0 {
-	//	return nil
-	//}
-	for a.OpenList.Len() > 0 {
-		for e := a.OpenList.Front(); e != nil; e = e.Next() {
-			a.OpenList.Remove(e)
+	for len(a.OpenList) > 0 {
+		for i, n := range a.OpenList {
+			a.OpenList = append(a.OpenList[:i], a.OpenList[i+1:]...)
 			a.Turns += 1
-			c := e.Value
-			c.(*Node).Execute(a)
-			if uint(a.OpenList.Len()) > a.MaxState {
-				a.MaxState = uint(a.OpenList.Len())
+			n.Execute(a)
+			if uint(len(a.OpenList)) > a.MaxState {
+				a.MaxState = uint(len(a.OpenList))
 			}
-			if c.(*Node).H == 0 {
-				fmt.Println("turns", a.Turns)
-				fmt.Println(a.MaxState)
-				return c.(*Node), nil
+			if n.H == 0 {
+				return n, nil
 			}
-			a.ClosedList.PushBack(c)
-			FCost(&a.OpenList)
+			a.ClosedList = append(a.ClosedList, n)
+			FCost(a.OpenList)
 		}
 	}
 	fmt.Println("turns", a.Turns)
@@ -59,11 +55,10 @@ func (a *Astar) RootNode(action int) (err error) {
 	var h int
 	currentState := a.Puzzle
 	h, err = a.HeuristicFunction(currentState, a.Goal)
-	fmt.Println(h)
 	if err != nil {
 		return
 	}
-	a.OpenList.PushBack(NewNode(
+	a.OpenList = append(a.OpenList, *NewNode(
 		actions.None,
 		0,
 		h,
@@ -72,8 +67,8 @@ func (a *Astar) RootNode(action int) (err error) {
 	return
 }
 
-func PrintListH(l *list.List) {
-	for e := l.Front(); e != nil; e = e.Next() {
-		fmt.Println("G => ", e.Value.(*Node).H)
+func printNodeSlice(nodes []Node) {
+	for _, n := range nodes {
+		fmt.Println("h->", n.H, "g->", n.G, "somm", n.H+n.G, "|", n.Somm)
 	}
 }

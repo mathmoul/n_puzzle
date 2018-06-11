@@ -5,12 +5,14 @@ import (
 	"N_Puzzle/npuzzle"
 	"log"
 	"container/list"
+	"fmt"
 )
 
 type Node struct {
 	Action actions.Action
 	G      int
 	H      int
+	Somm   int
 	Parent *Node
 	State  npuzzle.Puzzle
 }
@@ -24,6 +26,7 @@ func NewNode(action actions.Action, g int, h int, parent *Node, state npuzzle.Pu
 		Action: action,
 		G:      g,
 		H:      h,
+		Somm:   g + h,
 		Parent: parent,
 		State:  state,
 	}
@@ -41,9 +44,9 @@ func BoardsEqual(new npuzzle.Board, old npuzzle.Board) bool {
 	return false
 }
 
-func (n *Node) AlreadyClosed(closedList *list.List) bool {
-	for e := closedList.Front(); e != nil; e = e.Next() {
-		if BoardsEqual(n.State.Board, e.Value.(*Node).State.Board) {
+func (n *Node) AlreadyClosed(closedList *[]Node) bool {
+	for _, closedNode := range *closedList {
+		if BoardsEqual(n.State.Board, closedNode.State.Board) {
 			return true
 		}
 	}
@@ -68,18 +71,18 @@ func (n *Node) Execute(a *Astar) {
 	return
 }
 
-func OpenListLowerCost(l *list.List, newnode *Node) {
-	for e := l.Front(); e != nil; e = e.Next() {
-		v := e.Value.(*Node)
-		if BoardsEqual(v.State.Board, newnode.State.Board) {
-			if newnode.G < v.G {
-				l.Remove(e)
+func OpenListLowerCost(openList *[]Node, newNode *Node) {
+	o := *openList
+	for i, n := range *openList {
+		if BoardsEqual(n.State.Board, newNode.State.Board) {
+			if newNode.G < n.G {
+				*openList = append(o[:i], o[i+1:]...)
 			} else {
 				return
 			}
 		}
 	}
-	l.PushBack(newnode)
+	*openList = append(o, *newNode)
 }
 
 func TestNodes(ol *list.List, cl *list.List) (cpt int) {
@@ -94,7 +97,10 @@ func TestNodes(ol *list.List, cl *list.List) (cpt int) {
 }
 
 func (n *Node) PrintNode() {
+	fmt.Println("Move :", n.Action.Name)
 	n.State.PrintPuzzle()
+	fmt.Println("Cost:", n.H, "| Depth:", n.G)
+	fmt.Println()
 }
 
 func (n *Node) PrintResult() {
