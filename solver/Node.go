@@ -3,9 +3,9 @@ package solver
 import (
 	"N_Puzzle/actions"
 	"N_Puzzle/npuzzle"
-	"log"
 	"container/list"
 	"fmt"
+	"log"
 )
 
 type Node struct {
@@ -44,7 +44,7 @@ func BoardsEqual(new npuzzle.Board, old npuzzle.Board) bool {
 	return false
 }
 
-func (n *Node) AlreadyClosed(closedList *[]Node) bool {
+func (n *Node) AlreadyClosed(closedList *Nodes) bool {
 	for _, closedNode := range *closedList {
 		if BoardsEqual(n.State.Board, closedNode.State.Board) {
 			return true
@@ -63,15 +63,15 @@ func (n *Node) Execute(a *Astar) {
 				log.Fatal(err)
 			}
 			newNode := NewNode(b, n.G+1, h, n, *y)
-			if !newNode.AlreadyClosed(a.ClosedList) {
-				OpenListLowerCost(a.OpenList, newNode)
+			if !newNode.AlreadyClosed(&a.ClosedList) {
+				OpenListLowerCost(&a.OpenList, newNode)
 			}
 		}
 	}
 	return
 }
 
-func OpenListLowerCost(openList *[]Node, newNode *Node) {
+func OpenListLowerCost(openList *Nodes, newNode *Node) {
 	o := *openList
 	for i, n := range *openList {
 		if BoardsEqual(n.State.Board, newNode.State.Board) {
@@ -82,7 +82,7 @@ func OpenListLowerCost(openList *[]Node, newNode *Node) {
 			}
 		}
 	}
-	*openList = append(o, *newNode)
+	*openList = append(o, newNode)
 }
 
 func TestNodes(ol *list.List, cl *list.List) (cpt int) {
