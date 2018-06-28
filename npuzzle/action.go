@@ -7,10 +7,10 @@ import (
 func (p *Puzzle) Move(action actions.Action) {
 	switch action.Value {
 	case actions.Top:
-		p.Board.MoveTop(p.Zero.I)
+		p.Board.MoveTop(p.Zero.I, p.Size)
 		break
 	case actions.Bot:
-		p.Board.MoveBot(p.Zero.I)
+		p.Board.MoveBot(p.Zero.I, p.Size)
 		break
 	case actions.Left:
 		p.MoveLeft(p.Zero.I)
@@ -24,15 +24,15 @@ func (p *Puzzle) Move(action actions.Action) {
 	p.TabTiles()
 }
 
-func (b Board) MoveTop(i int) {
-	tmp := b[i-3]
-	b[i-3] = 0
+func (b Board) MoveTop(i, size int) {
+	tmp := b[i-size]
+	b[i-size] = 0
 	b[i] = tmp
 }
 
-func (b Board) MoveBot(i int) {
-	tmp := b[i+3]
-	b[i+3] = 0
+func (b Board) MoveBot(i, size int) {
+	tmp := b[i+size]
+	b[i+size] = 0
 	b[i] = tmp
 }
 

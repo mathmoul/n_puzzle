@@ -10,6 +10,7 @@ import (
 // Start function init astar
 func Start(p npuzzle.Puzzle, h uint, c uint) {
 	a := NewAstar(p, h)
+	fmt.Println(a.Goal)
 	if !a.CheckSolvability() {
 		log.Fatal("This puzzle is unsolvable")
 	}
@@ -25,6 +26,7 @@ func Start(p npuzzle.Puzzle, h uint, c uint) {
 }
 
 const (
+	//No action
 	No = iota
 )
 
@@ -47,12 +49,12 @@ func (a *Astar) Run(FCost SortList) (q *Node, err error) {
 		a.ClosedList = append(a.ClosedList, n)
 		FCost(a.OpenList)
 	}
-	fmt.Println("Searching solution")
-
-	fmt.Println("turns", a.Turns)
 	return
 }
 
+/*
+RootNode func
+*/
 func (a *Astar) RootNode(action int) (err error) {
 	var h int
 	currentState := a.Puzzle

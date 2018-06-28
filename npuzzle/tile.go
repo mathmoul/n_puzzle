@@ -15,16 +15,12 @@ func (t *Tile) TestAction(action int, size int) bool {
 	switch action {
 	case actions.Top:
 		return !(t.Y-1 < 0)
-		break
 	case actions.Bot:
 		return t.Y+1 < size
-		break
 	case actions.Left:
 		return !(t.X-1 < 0)
-		break
 	case actions.Right:
 		return t.X+1 < size
-		break
 	}
 	return false
 }

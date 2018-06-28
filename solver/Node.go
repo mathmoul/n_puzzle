@@ -6,6 +6,7 @@ import (
 	"container/list"
 	"fmt"
 	"log"
+	"sync"
 )
 
 type Node struct {
@@ -54,20 +55,27 @@ func (n *Node) AlreadyClosed(closedList *Nodes) bool {
 }
 
 func (n *Node) Execute(a *Astar) {
+	ch := make(chan *Node, 4)
+	var wg sync.WaitGroup
 	for _, b := range actions.L {
 		if n.State.Zero.ToTile(n.State.Size).TestAction(b.Value, n.State.Size) {
-			var y = n.State.Copy()
-			y.Move(b)
-			h, err := a.HeuristicFunction(*y, a.Goal)
-			if err != nil {
-				log.Fatal(err)
-			}
-			newNode := NewNode(b, n.G+1, h, n, *y)
+			wg.Add(1)
+			go func(wg *sync.WaitGroup, state *npuzzle.Puzzle, ch chan *Node, b actions.Action, a *Astar) {
+				wg.Done()
+				state.Move(b)
+				h, err := a.HeuristicFunction(*state, a.Goal)
+				if err != nil {
+					log.Fatal(err)
+				}
+				ch <- NewNode(b, n.G+1, h, n, *state)
+			}(&wg, n.State.Copy(), ch, b, a)
+			newNode := <-ch
 			if !newNode.AlreadyClosed(&a.ClosedList) {
 				OpenListLowerCost(&a.OpenList, newNode)
 			}
 		}
 	}
+	wg.Wait()
 	return
 }
 
