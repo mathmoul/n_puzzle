@@ -8,11 +8,18 @@ import (
 	"log"
 )
 
+/** Node struct
+save all node infos */
 type Node struct {
 	Action actions.Action
-	G      int
-	H      int
-	Somm   int
+	/** Depth score of the node */
+	G uint64
+
+	/** Heuristic score of the node */
+	H uint64
+
+	/** Somm of Depth + Heuristic */
+	Somm   uint64
 	Parent *Node
 	State  npuzzle.Puzzle
 }
@@ -21,12 +28,19 @@ type INode interface {
 	Execute() *Node
 }
 
-func NewNode(action actions.Action, g int, h int, parent *Node, state npuzzle.Puzzle) *Node {
+func sp(parent *Node) (s uint64) {
+	if parent != nil {
+		return parent.H
+	}
+	return
+}
+
+func NewNode(action actions.Action, g uint64, h uint64, parent *Node, state npuzzle.Puzzle) *Node {
 	return &Node{
 		Action: action,
-		G:      g,
-		H:      h,
-		Somm:   g + h,
+		G:      uint64(g),
+		H:      uint64(h) + sp(parent),
+		Somm:   uint64(g) + uint64(h),
 		Parent: parent,
 		State:  state,
 	}
@@ -62,7 +76,7 @@ func (n *Node) Execute(a *Astar) {
 			if err != nil {
 				log.Fatal(err)
 			}
-			newNode := NewNode(b, n.G+1, h, n, *y)
+			newNode := NewNode(b, n.G+1, uint64(h), n, *y)
 			if !newNode.AlreadyClosed(&a.ClosedList) {
 				OpenListLowerCost(&a.OpenList, newNode)
 			}

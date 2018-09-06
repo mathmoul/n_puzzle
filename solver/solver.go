@@ -62,8 +62,8 @@ func (a *Astar) RootNode(action int) (err error) {
 	}
 	a.OpenList = append(a.OpenList, NewNode(
 		actions.None,
-		0,
-		h,
+		uint64(0),
+		uint64(h),
 		nil,
 		a.Puzzle))
 	return
