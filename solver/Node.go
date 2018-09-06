@@ -11,9 +11,9 @@ import (
 
 type Node struct {
 	Action actions.Action
-	G      int
-	H      int
-	Somm   int
+	G      uint
+	H      uint
+	Somm   uint
 	Parent *Node
 	State  npuzzle.Puzzle
 }
@@ -22,7 +22,7 @@ type INode interface {
 	Execute() *Node
 }
 
-func NewNode(action actions.Action, g int, h int, parent *Node, state npuzzle.Puzzle) *Node {
+func NewNode(action actions.Action, g uint, h uint, parent *Node, state npuzzle.Puzzle) *Node {
 	return &Node{
 		Action: action,
 		G:      g,
@@ -67,7 +67,7 @@ func (n *Node) Execute(a *Astar) {
 				if err != nil {
 					log.Fatal(err)
 				}
-				ch <- NewNode(b, n.G+1, h, n, *state)
+				ch <- NewNode(b, n.G+1, uint(h), n, *state)
 			}(&wg, n.State.Copy(), ch, b, a)
 			newNode := <-ch
 			if !newNode.AlreadyClosed(&a.ClosedList) {

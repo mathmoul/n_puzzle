@@ -31,6 +31,8 @@ const (
 
 // Run function Runs the astar algorithm
 func (a *Astar) Run(FCost SortList) (q *Node, err error) {
+	fmt.Println("here")
+
 	if err = a.RootNode(No); err != nil {
 		return
 	}
@@ -46,6 +48,7 @@ func (a *Astar) Run(FCost SortList) (q *Node, err error) {
 			a.MaxState = uint(len(a.OpenList))
 		}
 		a.ClosedList = append(a.ClosedList, n)
+		//a.OpenList = FasterSort(a.OpenList, FCost)
 		FCost(a.OpenList)
 	}
 	return
@@ -64,7 +67,7 @@ func (a *Astar) RootNode(action int) (err error) {
 	a.OpenList = append(a.OpenList, NewNode(
 		actions.None,
 		0,
-		h,
+		uint(h),
 		nil,
 		a.Puzzle))
 	return
