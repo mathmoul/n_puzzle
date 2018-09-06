@@ -1,20 +1,18 @@
 package solver
 
 import (
-	"sort"
 	"fmt"
+	"sort"
 )
-
 
 type SortList func(Nodes)
 
-func (n Nodes) Len() int               { return len(n) }
-func (n Nodes) Swap(i, j int)          { n[i], n[j] = n[j], n[i] }
-func (n Nodes) Less(i, j int) bool     { return n[i].H+n[i].G < n[j].H+n[i].G }
-
+func (n Nodes) Len() int           { return len(n) }
+func (n Nodes) Swap(i, j int)      { n[i], n[j] = n[j], n[i] }
+func (n Nodes) Less(i, j int) bool { return n[i].H+n[i].G < n[j].H+n[j].G }
 
 func SortH(n Nodes) {
-	sort.SliceStable(n, func (i, j int) bool {
+	sort.SliceStable(n, func(i, j int) bool {
 		return n[i].H < n[j].H
 	})
 }
