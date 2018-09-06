@@ -39,7 +39,7 @@ func NewNode(action actions.Action, g uint64, h uint64, parent *Node, state npuz
 	return &Node{
 		Action: action,
 		G:      uint64(g),
-		H:      uint64(h) + sp(parent),
+		H:      uint64(h),
 		Somm:   uint64(g) + uint64(h),
 		Parent: parent,
 		State:  state,
