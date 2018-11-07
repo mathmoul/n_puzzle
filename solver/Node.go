@@ -60,6 +60,7 @@ func (n *Node) Execute(a *Astar) {
 				state.CreateUuid()
 				h, err := a.HeuristicFunction(*state, a.Goal)
 				if err != nil {
+
 					log.Fatal(err)
 				}
 				ch <- NewNode(b, n.G+1, uint(h), n, *state)
