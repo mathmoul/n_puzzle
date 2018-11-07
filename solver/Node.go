@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"sync"
+	"time"
 )
 
 type Node struct {
@@ -33,21 +34,13 @@ func NewNode(action actions.Action, g int, h int, parent *Node, state npuzzle.Pu
 	}
 }
 
-func BoardsEqual(new npuzzle.Board, old npuzzle.Board) bool {
-	if len(new) == len(old) {
-		for i := 0; i < len(old); i++ {
-			if int(new[i]) != int(old[i]) {
-				return false
-			}
-		}
-		return true
-	}
-	return false
+func BoardsEqual(new npuzzle.Puzzle, old npuzzle.Puzzle) bool {
+	return old.Uuid == new.Uuid
 }
 
 func (n *Node) AlreadyClosed(closedList *Nodes) bool {
 	for _, closedNode := range *closedList {
-		if BoardsEqual(n.State.Board, closedNode.State.Board) {
+		if BoardsEqual(n.State, closedNode.State) {
 			return true
 		}
 	}
@@ -55,6 +48,7 @@ func (n *Node) AlreadyClosed(closedList *Nodes) bool {
 }
 
 func (n *Node) Execute(a *Astar) {
+	t := time.Now()
 	ch := make(chan *Node, 4)
 	var wg sync.WaitGroup
 	for _, b := range actions.L {
@@ -63,6 +57,7 @@ func (n *Node) Execute(a *Astar) {
 			go func(wg *sync.WaitGroup, state *npuzzle.Puzzle, ch chan *Node, b actions.Action, a *Astar) {
 				wg.Done()
 				state.Move(b)
+				state.CreateUuid()
 				h, err := a.HeuristicFunction(*state, a.Goal)
 				if err != nil {
 					log.Fatal(err)
@@ -76,13 +71,14 @@ func (n *Node) Execute(a *Astar) {
 		}
 	}
 	wg.Wait()
+	fmt.Println(time.Since(t))
 	return
 }
 
 func OpenListLowerCost(openList *Nodes, newNode *Node) {
 	o := *openList
 	for i, n := range *openList {
-		if BoardsEqual(n.State.Board, newNode.State.Board) {
+		if BoardsEqual(n.State, newNode.State) {
 			if newNode.G < n.G {
 				*openList = append(o[:i], o[i+1:]...)
 			} else {
@@ -96,7 +92,7 @@ func OpenListLowerCost(openList *Nodes, newNode *Node) {
 func TestNodes(ol *list.List, cl *list.List) (cpt int) {
 	for c := cl.Front(); c != nil; c = c.Next() {
 		for o := ol.Front(); o != nil; o = o.Next() {
-			if BoardsEqual(c.Value.(*Node).State.Board, o.Value.(*Node).State.Board) {
+			if BoardsEqual(c.Value.(*Node).State, o.Value.(*Node).State) {
 				cpt++
 			}
 		}

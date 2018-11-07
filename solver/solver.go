@@ -57,6 +57,7 @@ RootNode func
 func (a *Astar) RootNode(action int) (err error) {
 	var h int
 	currentState := a.Puzzle
+	a.Puzzle.CreateUuid()
 	h, err = a.HeuristicFunction(currentState, a.Goal)
 	if err != nil {
 		return

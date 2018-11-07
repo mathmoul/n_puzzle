@@ -1,5 +1,11 @@
 package npuzzle
 
+import (
+	"crypto/md5"
+	"strconv"
+	"strings"
+)
+
 // TileIndex struct
 type TileIndex struct {
 	I int
@@ -11,11 +17,22 @@ type Board []int
 type Puzzle struct {
 	Zero TileIndex
 	Board
+	Uuid string
 	Size int
 	Tiles
 }
 
-func (b Board) Copy(i int) (Board) {
+func (p *Puzzle) CreateUuid() {
+	b := p.Board
+	tab := make([]string, p.Size*p.Size)
+	for k, v := range b {
+		tab[k] = strconv.Itoa(v)
+	}
+	hash := md5.New()
+	p.Uuid = string(hash.Sum([]byte(strings.Join(tab, ""))))
+}
+
+func (b Board) Copy(i int) Board {
 	nb := make([]int, i*i)
 	if len(b) == len(nb) {
 		for i, y := range b {
@@ -26,10 +43,11 @@ func (b Board) Copy(i int) (Board) {
 	return Board{}
 }
 
-func (p *Puzzle) Copy() (*Puzzle) {
+func (p *Puzzle) Copy() *Puzzle {
 	return &Puzzle{
 		Zero:  p.Zero,
 		Board: p.Board.Copy(p.Size),
+		Uuid:  p.Uuid,
 		Size:  p.Size,
 		Tiles: p.Tiles.Copy(p.Size),
 	}

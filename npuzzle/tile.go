@@ -9,6 +9,7 @@ type Tile struct {
 	X int
 	Y int
 }
+
 type Tiles []Tile
 
 func (t *Tile) TestAction(action int, size int) bool {
