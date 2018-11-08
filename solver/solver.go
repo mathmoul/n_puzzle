@@ -14,7 +14,7 @@ func Start(p npuzzle.Puzzle, h uint, c uint) {
 		log.Fatal("This puzzle is unsolvable")
 	}
 	fmt.Println("Searching solution...")
-	if n, err := a.Run(SortSwitch(c)); err != nil {
+	if n, err := a.Run( /*SortSwitch(c)*/ ); err != nil {
 		log.Fatal(err)
 	} else {
 		n.PrintResult()
@@ -30,26 +30,26 @@ const (
 )
 
 // Run function Runs the astar algorithm
-func (a *Astar) Run(FCost SortList) (q *Node, err error) {
-	fmt.Println("here")
-
+func (a *Astar) Run( /*FCost SortList */ ) (q *Node, err error) {
 	if err = a.RootNode(No); err != nil {
 		return
 	}
-	for len(a.OpenList) > 0 {
-		n := a.OpenList[0]
-		a.OpenList = append(a.OpenList[:0], a.OpenList[1:]...)
-		if n.H == 0 {
-			return n, nil
+	for a.OpenList.Num() > 0 {
+		node := a.OpenList.ExtractMinValue()
+
+		uuid := node.(*Node).State.CreateUuid()
+
+		if node.(*Node).H == 0 {
+			return node.(*Node), nil
 		}
 		a.Turns++
-		n.Execute(a)
-		if uint(len(a.OpenList)) > a.MaxState {
-			a.MaxState = uint(len(a.OpenList))
+		node.(*Node).Execute(a)
+		num := a.OpenList.Num()
+		if num > a.MaxState {
+			a.MaxState = num
 		}
-		a.ClosedList = append(a.ClosedList, n)
-		//a.OpenList = FasterSort(a.OpenList, FCost)
-		FCost(a.OpenList)
+		a.ClosedList[uuid] = node.(*Node)
+
 	}
 	return
 }
@@ -60,22 +60,15 @@ RootNode func
 func (a *Astar) RootNode(action int) (err error) {
 	var h int
 	currentState := a.Puzzle
-	a.Puzzle.CreateUuid()
 	h, err = a.HeuristicFunction(currentState, a.Goal)
 	if err != nil {
 		return
 	}
-	a.OpenList = append(a.OpenList, NewNode(
+	a.OpenList.InsertValue(NewNode(
 		actions.None,
 		0,
 		uint(h),
 		nil,
 		a.Puzzle))
 	return
-}
-
-func printNodeSlice(nodes Nodes) {
-	for _, n := range nodes {
-		fmt.Println("h->", n.H, "g->", n.G, "somm", n.H+n.G, "|", n.Somm)
-	}
 }

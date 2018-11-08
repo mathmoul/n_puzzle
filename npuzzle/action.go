@@ -4,8 +4,8 @@ import (
 	"N_Puzzle/actions"
 )
 
-func (p *Puzzle) Move(action actions.Action) {
-	switch action.Value {
+func (p *Puzzle) Move(action int) {
+	switch action {
 	case actions.Top:
 		p.Board.MoveTop(p.Zero.I, p.Size)
 		break

@@ -4,6 +4,8 @@ import (
 	"N_Puzzle/npuzzle"
 	"container/list"
 	"fmt"
+
+	"github.com/starwander/GoFibonacciHeap"
 )
 
 type List struct {
@@ -11,15 +13,15 @@ type List struct {
 	Next *list.List
 }
 
-type Nodes []*Node
+type ClosedList map[string]*Node
 
 type Astar struct {
 	npuzzle.Puzzle
-	Goal       npuzzle.Puzzle
-	OpenList   Nodes
-	ClosedList Nodes
-	Turns      uint
-	MaxState   uint
+	Goal     npuzzle.Puzzle
+	OpenList *fibHeap.FibHeap
+	ClosedList
+	Turns    uint
+	MaxState uint
 	HeuristicFunction
 }
 
@@ -47,8 +49,8 @@ func NewAstar(p npuzzle.Puzzle, h uint) *Astar {
 	return &Astar{
 		Puzzle:            p,
 		Goal:              npuzzle.Goal(p.Size),
-		OpenList:          []*Node{},
-		ClosedList:        []*Node{},
+		OpenList:          fibHeap.NewFibHeap(),
+		ClosedList:        make(map[string]*Node),
 		HeuristicFunction: FindHeuristic(h),
 		Turns:             0,
 		MaxState:          0,

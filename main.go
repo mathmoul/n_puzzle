@@ -3,9 +3,9 @@ package main
 import (
 	"N_Puzzle/flags"
 	"N_Puzzle/npuzzle"
-	"log"
 	"N_Puzzle/parser"
 	"N_Puzzle/solver"
+	"log"
 )
 
 func main() {

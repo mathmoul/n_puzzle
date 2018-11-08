@@ -3,20 +3,26 @@ package solver
 import (
 	"N_Puzzle/actions"
 	"N_Puzzle/npuzzle"
-	"container/list"
 	"fmt"
 	"log"
-	"sync"
-	"time"
+
+	. "github.com/starwander/GoFibonacciHeap"
 )
 
 type Node struct {
 	Action actions.Action
 	G      uint
 	H      uint
-	Somm   uint
 	Parent *Node
 	State  npuzzle.Puzzle
+}
+
+func (n *Node) Tag() interface{} {
+	return n.State.CreateUuid()
+}
+
+func (n *Node) Key() float64 {
+	return float64(n.G + n.H)
 }
 
 type INode interface {
@@ -28,77 +34,66 @@ func NewNode(action actions.Action, g uint, h uint, parent *Node, state npuzzle.
 		Action: action,
 		G:      g,
 		H:      h,
-		Somm:   g + h,
 		Parent: parent,
 		State:  state,
 	}
 }
 
-func BoardsEqual(new npuzzle.Puzzle, old npuzzle.Puzzle) bool {
-	return old.Uuid == new.Uuid
+func (n *Node) AlreadyClosed(closedList ClosedList) bool {
+	_, ok := closedList[n.State.CreateUuid()]
+	return ok
 }
 
-func (n *Node) AlreadyClosed(closedList *Nodes) bool {
-	for _, closedNode := range *closedList {
-		if BoardsEqual(n.State, closedNode.State) {
-			return true
+func move(action actions.Action, state *npuzzle.Puzzle, astar *Astar, n *Node) chan *Node {
+	tile := state.Zero.ToTile(state.Size)
+	size := state.Size
+	ch := make(chan *Node)
+	go func() {
+		if tile.TestAction(action.Value, size) {
+			state.Move(action.Value)
+			state.CreateUuid()
+			h, err := astar.HeuristicFunction(*state, astar.Goal)
+			if err != nil {
+				log.Fatal(err)
+			}
+			ch <- NewNode(action, n.G+1, uint(h), n, *state)
+		} else {
+			ch <- nil
+		}
+		close(ch)
+	}()
+	return ch
+}
+
+func add(newNode *Node, a *Astar) {
+	if newNode != nil {
+		if !newNode.AlreadyClosed(a.ClosedList) {
+			OpenListLowerCost(a.OpenList, newNode)
 		}
 	}
-	return false
 }
 
 func (n *Node) Execute(a *Astar) {
-	t := time.Now()
-	ch := make(chan *Node, 4)
-	var wg sync.WaitGroup
-	for _, b := range actions.L {
-		if n.State.Zero.ToTile(n.State.Size).TestAction(b.Value, n.State.Size) {
-			wg.Add(1)
-			go func(wg *sync.WaitGroup, state *npuzzle.Puzzle, ch chan *Node, b actions.Action, a *Astar) {
-				wg.Done()
-				state.Move(b)
-				state.CreateUuid()
-				h, err := a.HeuristicFunction(*state, a.Goal)
-				if err != nil {
+	top, bot, left, right := <-move(actions.L[0], n.State.Copy(), a, n), <-move(actions.L[1], n.State.Copy(), a, n), <-move(actions.L[2], n.State.Copy(), a, n), <-move(actions.L[3], n.State.Copy(), a, n)
 
-					log.Fatal(err)
-				}
-				ch <- NewNode(b, n.G+1, uint(h), n, *state)
-			}(&wg, n.State.Copy(), ch, b, a)
-			newNode := <-ch
-			if !newNode.AlreadyClosed(&a.ClosedList) {
-				OpenListLowerCost(&a.OpenList, newNode)
-			}
-		}
-	}
-	wg.Wait()
-	fmt.Println(time.Since(t))
-	return
+	add(top, a)
+	add(bot, a)
+	add(left, a)
+	add(right, a)
 }
 
-func OpenListLowerCost(openList *Nodes, newNode *Node) {
-	o := *openList
-	for i, n := range *openList {
-		if BoardsEqual(n.State, newNode.State) {
-			if newNode.G < n.G {
-				*openList = append(o[:i], o[i+1:]...)
-			} else {
-				return
-			}
-		}
+func OpenListLowerCost(o *FibHeap, newNode *Node) {
+	if err := o.DecreaseKeyValue(newNode); err == nil {
+		return
 	}
-	*openList = append(o, newNode)
-}
-
-func TestNodes(ol *list.List, cl *list.List) (cpt int) {
-	for c := cl.Front(); c != nil; c = c.Next() {
-		for o := ol.Front(); o != nil; o = o.Next() {
-			if BoardsEqual(c.Value.(*Node).State, o.Value.(*Node).State) {
-				cpt++
-			}
-		}
+	if err := o.InsertValue(newNode); err == nil {
+		return
 	}
-	return
+	uuid := newNode.State.CreateUuid()
+	if key := o.GetTag(uuid); key > float64(newNode.G+newNode.H) {
+		o.ExtractTag(uuid)
+		o.InsertValue(newNode)
+	}
 }
 
 func (n *Node) PrintNode() {
