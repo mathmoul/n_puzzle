@@ -5,6 +5,7 @@ import (
 	"N_Puzzle/npuzzle"
 	"fmt"
 	"log"
+	"time"
 
 	. "github.com/starwander/GoFibonacciHeap"
 )
@@ -68,14 +69,15 @@ func move(action actions.Action, state *npuzzle.Puzzle, astar *Astar, n *Node) c
 func add(newNode *Node, a *Astar) {
 	if newNode != nil {
 		if !newNode.AlreadyClosed(a.ClosedList) {
+			t := time.Now()
 			OpenListLowerCost(a.OpenList, newNode)
+			fmt.Println(time.Since(t))
 		}
 	}
 }
 
 func (n *Node) Execute(a *Astar) {
 	top, bot, left, right := <-move(actions.L[0], n.State.Copy(), a, n), <-move(actions.L[1], n.State.Copy(), a, n), <-move(actions.L[2], n.State.Copy(), a, n), <-move(actions.L[3], n.State.Copy(), a, n)
-
 	add(top, a)
 	add(bot, a)
 	add(left, a)

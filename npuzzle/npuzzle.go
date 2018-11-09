@@ -1,7 +1,6 @@
 package npuzzle
 
 import (
-	"crypto/md5"
 	"strconv"
 	"strings"
 )
@@ -27,8 +26,7 @@ func (p *Puzzle) CreateUuid() string {
 	for k, v := range b {
 		tab[k] = strconv.Itoa(v)
 	}
-	hash := md5.New()
-	return string(hash.Sum([]byte(strings.Join(tab, "|"))))
+	return strings.Join(tab, "|")
 }
 
 func (b Board) Copy(i int) Board {
