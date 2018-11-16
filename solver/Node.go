@@ -4,10 +4,9 @@ import (
 	"N_Puzzle/actions"
 	"N_Puzzle/npuzzle"
 	"fmt"
+	heap "github.com/theodesp/go-heaps"
+	"github.com/theodesp/go-heaps/rank_pairing"
 	"log"
-	"time"
-
-	. "github.com/starwander/GoFibonacciHeap"
 )
 
 type Node struct {
@@ -16,6 +15,10 @@ type Node struct {
 	H      uint
 	Parent *Node
 	State  npuzzle.Puzzle
+}
+
+func (n *Node) Compare(than heap.Item) int {
+	return int((n.G + n.H) - (than.(*Node).G + than.(*Node).H))
 }
 
 func (n *Node) Tag() interface{} {
@@ -69,9 +72,7 @@ func move(action actions.Action, state *npuzzle.Puzzle, astar *Astar, n *Node) c
 func add(newNode *Node, a *Astar) {
 	if newNode != nil {
 		if !newNode.AlreadyClosed(a.ClosedList) {
-			t := time.Now()
 			OpenListLowerCost(a.OpenList, newNode)
-			fmt.Println(time.Since(t))
 		}
 	}
 }
@@ -84,18 +85,8 @@ func (n *Node) Execute(a *Astar) {
 	add(right, a)
 }
 
-func OpenListLowerCost(o *FibHeap, newNode *Node) {
-	if err := o.DecreaseKeyValue(newNode); err == nil {
-		return
-	}
-	if err := o.InsertValue(newNode); err == nil {
-		return
-	}
-	uuid := newNode.State.CreateUuid()
-	if key := o.GetTag(uuid); key > float64(newNode.G+newNode.H) {
-		o.ExtractTag(uuid)
-		o.InsertValue(newNode)
-	}
+func OpenListLowerCost(o *rank_paring.RPHeap, newNode *Node) {
+	o.Insert(newNode)
 }
 
 func (n *Node) PrintNode() {

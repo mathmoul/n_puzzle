@@ -5,7 +5,7 @@ import (
 	"container/list"
 	"fmt"
 
-	"github.com/starwander/GoFibonacciHeap"
+	"github.com/theodesp/go-heaps/rank_pairing"
 )
 
 type List struct {
@@ -13,12 +13,12 @@ type List struct {
 	Next *list.List
 }
 
-type ClosedList map[string]*Node
+type ClosedList map[string]interface{}
 
 type Astar struct {
 	npuzzle.Puzzle
 	Goal     npuzzle.Puzzle
-	OpenList *fibHeap.FibHeap
+	OpenList *rank_paring.RPHeap
 	ClosedList
 	Turns    uint
 	MaxState uint
@@ -49,8 +49,8 @@ func NewAstar(p npuzzle.Puzzle, h uint) *Astar {
 	return &Astar{
 		Puzzle:            p,
 		Goal:              npuzzle.Goal(p.Size),
-		OpenList:          fibHeap.NewFibHeap(),
-		ClosedList:        make(map[string]*Node),
+		OpenList:          rank_paring.New().Init(),
+		ClosedList:        make(map[string]interface{}),
 		HeuristicFunction: FindHeuristic(h),
 		Turns:             0,
 		MaxState:          0,
