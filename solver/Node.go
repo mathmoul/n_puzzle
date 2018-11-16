@@ -2,11 +2,13 @@ package solver
 
 import (
 	"N_Puzzle/actions"
+	"N_Puzzle/bst"
 	"N_Puzzle/npuzzle"
 	"fmt"
+	"log"
+
 	heap "github.com/theodesp/go-heaps"
 	"github.com/theodesp/go-heaps/rank_pairing"
-	"log"
 )
 
 type Node struct {
@@ -18,7 +20,8 @@ type Node struct {
 }
 
 func (n *Node) Compare(than heap.Item) int {
-	return int((n.G + n.H) - (than.(*Node).G + than.(*Node).H))
+	return costFunction(n, than.(*Node))
+	// return int((n.G + n.H) - (than.(*Node).G + than.(*Node).H))
 }
 
 func (n *Node) Tag() interface{} {
@@ -43,8 +46,8 @@ func NewNode(action actions.Action, g uint, h uint, parent *Node, state npuzzle.
 	}
 }
 
-func (n *Node) AlreadyClosed(closedList ClosedList) bool {
-	_, ok := closedList[n.State.CreateUuid()]
+func (n *Node) AlreadyClosed(closedList *bst.Node) bool {
+	_, ok := closedList.Find(bst.String(n.State.CreateUuid()))
 	return ok
 }
 

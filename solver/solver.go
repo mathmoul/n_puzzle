@@ -2,6 +2,7 @@ package solver
 
 import (
 	"N_Puzzle/actions"
+	"N_Puzzle/bst"
 	"N_Puzzle/npuzzle"
 	"fmt"
 	"log"
@@ -9,19 +10,19 @@ import (
 
 // Start function init astar
 func Start(p npuzzle.Puzzle, h uint, c uint) {
-	a := NewAstar(p, h)
+	a := NewAstar(p, h, c)
+	costFunction = FindCostFunction(c)
 	if !a.CheckSolvability() {
 		log.Fatal("This puzzle is unsolvable")
 	}
 	fmt.Println("Searching solution...")
-	if n, err := a.Run(p.Size /*, SortSwitch(c)*/); err != nil {
+	if n, err := a.Run(p.Size); err != nil {
 		log.Fatal(err)
 	} else {
 		n.PrintResult()
 		fmt.Println("Number of turns:", a.Turns)
 		fmt.Println("Max state:", a.MaxState)
 	}
-	//d.Answer.PrintPuzzle()
 }
 
 const (
@@ -31,13 +32,16 @@ const (
 
 // Run function Runs the astar algorithm
 func (a *Astar) Run(size int /*FCost SortList */) (q *Node, err error) {
-	if size < 4 {
-		return run(a)
-	}
+	//if size < 4 {
+	//	return run(a)
+	//}
 	return runN(a)
 }
 
 func run(a *Astar /* , FCost */) (q *Node, err error) {
+	if err = a.RootNode(No); err != nil {
+		return
+	}
 	return
 }
 
@@ -59,8 +63,11 @@ func runN(a *Astar /* , FCost */) (q *Node, err error) {
 		if num > int(a.MaxState) {
 			a.MaxState = uint(num)
 		}
-		a.ClosedList[uuid] = 1
-
+		if a.ClosedList == nil {
+			a.ClosedList = bst.NewNode(bst.String(uuid))
+		} else {
+			a.ClosedList.Insert(bst.String(uuid))
+		}
 	}
 	return
 }

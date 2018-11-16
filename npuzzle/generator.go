@@ -1,11 +1,11 @@
 package npuzzle
 
 import (
+	"N_Puzzle/flags"
 	"crypto/rand"
 	"errors"
 	"log"
 	"math/big"
-	"N_Puzzle/flags"
 )
 
 func (p *Puzzle) makeGoals() {
@@ -69,8 +69,7 @@ func (p *Puzzle) swapEmpty() (err error) {
 		log.Fatal(err)
 	}
 	swi := poss[n.Int64()]
-	p.Board[p.Zero.I] = p.Board[swi]
-	p.Board[swi] = 0
+	p.Board[p.Zero.I], p.Board[swi] = p.Board[swi], 0
 	return
 }
 

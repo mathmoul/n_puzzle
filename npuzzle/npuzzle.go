@@ -12,6 +12,11 @@ type TileIndex struct {
 
 type Board []int
 
+// type Board interface {
+// 	FromBits(uint64) board
+// 	ToBits(board) uint64
+// }
+
 // Puzzle struct
 type Puzzle struct {
 	Zero TileIndex

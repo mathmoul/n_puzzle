@@ -1,7 +1,7 @@
 package npuzzle
 
 import (
-  "fmt"
+	"fmt"
 	"strconv"
 
 	"github.com/fatih/color"

@@ -13,10 +13,10 @@ func (p *Puzzle) Move(action int) {
 		p.Board.MoveBot(p.Zero.I, p.Size)
 		break
 	case actions.Left:
-		p.MoveLeft(p.Zero.I)
+		p.Board.MoveLeft(p.Zero.I)
 		break
 	case actions.Right:
-		p.MoveRight(p.Zero.I)
+		p.Board.MoveRight(p.Zero.I)
 		break
 	}
 

@@ -1,6 +1,7 @@
 package solver
 
 import (
+	"N_Puzzle/bst"
 	"N_Puzzle/npuzzle"
 	"container/list"
 	"fmt"
@@ -13,15 +14,15 @@ type List struct {
 	Next *list.List
 }
 
-type ClosedList map[string]interface{}
+var costFunction CostFunction
 
 type Astar struct {
 	npuzzle.Puzzle
-	Goal     npuzzle.Puzzle
-	OpenList *rank_paring.RPHeap
-	ClosedList
-	Turns    uint
-	MaxState uint
+	Goal       npuzzle.Puzzle
+	OpenList   *rank_paring.RPHeap
+	ClosedList *bst.Node
+	Turns      uint
+	MaxState   uint
 	HeuristicFunction
 }
 
@@ -45,12 +46,12 @@ func (a *Astar) Done() bool {
 	return false
 }
 
-func NewAstar(p npuzzle.Puzzle, h uint) *Astar {
+func NewAstar(p npuzzle.Puzzle, h, c uint) *Astar {
 	return &Astar{
 		Puzzle:            p,
 		Goal:              npuzzle.Goal(p.Size),
 		OpenList:          rank_paring.New().Init(),
-		ClosedList:        make(map[string]interface{}),
+		ClosedList:        nil,
 		HeuristicFunction: FindHeuristic(h),
 		Turns:             0,
 		MaxState:          0,

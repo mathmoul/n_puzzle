@@ -18,7 +18,7 @@ func inversion(b Board, i int) (inversions int) {
 			continue
 		}
 		if n > slice[r] {
-			inversions += 1
+			inversions++
 		}
 	}
 	return inversions

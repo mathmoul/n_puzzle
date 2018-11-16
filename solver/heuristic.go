@@ -3,8 +3,9 @@ package solver
 import (
 	"N_Puzzle/npuzzle"
 	"N_Puzzle/tools"
-	"github.com/go-errors/errors"
 	"fmt"
+
+	"github.com/go-errors/errors"
 )
 
 type HeuristicFunction func(board npuzzle.Puzzle, dt npuzzle.Puzzle) (ret int, err error)
@@ -33,6 +34,48 @@ func FindHeuristic(h uint) HeuristicFunction {
 		break
 	}
 	return ManhattanHeuristic()
+}
+
+type CostFunction func(a, b *Node) int
+
+const (
+	greedy = iota
+	aStar
+	uniform
+)
+
+func FindCostFunction(c uint) CostFunction {
+	fmt.Print("Chosen Cost function : ")
+	switch c - 1 {
+	case greedy:
+		return greedyCost()
+	case aStar:
+		return astarCost()
+	case uniform:
+		return uniformCost()
+	}
+	return astarCost()
+}
+
+func greedyCost() CostFunction {
+	fmt.Println("greedy cost")
+	return (func(a, b *Node) int {
+		return int(a.H - b.H)
+	})
+}
+
+func astarCost() CostFunction {
+	fmt.Println("astar cost")
+	return (func(a, b *Node) int {
+		return int(a.G+a.H) - int(b.G+b.H)
+	})
+}
+
+func uniformCost() CostFunction {
+	fmt.Println("Uniform cost")
+	return (func(a, b *Node) int {
+		return int(a.G) - int(b.G)
+	})
 }
 
 // Add on A the solv function depends on heuristic and fill Solution number
