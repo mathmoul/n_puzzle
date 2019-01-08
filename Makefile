@@ -9,7 +9,10 @@ main.go \
 parser.go \
 puzzle.go \
 solver.go \
-tools.go 
+tools.go \
+astar.go \
+node.go \
+heuristic.go
 
 all: $(NAME)
 SRC = $(addprefix $(SRC_PATH)/, $(SRC_NAME))
