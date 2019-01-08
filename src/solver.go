@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"time"
 
 	heap "github.com/theodesp/go-heaps"
 	rank_paring "github.com/theodesp/go-heaps/rank_pairing"
@@ -49,6 +50,7 @@ func runN(a *Astar /* , FCost */) (q *Node, err error) {
 		return
 	}
 	for a.OpenList.Size() > 0 {
+		now := time.Now()
 		node := a.OpenList.DeleteMin()
 
 		uuid := node.(*Node).State.CreateUuid()
@@ -57,7 +59,7 @@ func runN(a *Astar /* , FCost */) (q *Node, err error) {
 			return node.(*Node), nil
 		}
 		a.Turns++
-		node.(*Node).Execute(a)
+		node.(*Node).Execute(a, uuid)
 		num := a.OpenList.Size()
 		if num > int(a.MaxState) {
 			a.MaxState = uint(num)
@@ -67,6 +69,7 @@ func runN(a *Astar /* , FCost */) (q *Node, err error) {
 		} else {
 			a.ClosedList.Insert(BstString(uuid))
 		}
+		fmt.Println(time.Since(now))
 	}
 	return
 }
@@ -82,7 +85,7 @@ func (a *Astar) RootNode(action int) (err error) {
 		return
 	}
 	a.OpenList.Insert(NewNode(
-		None,
+		None.Name,
 		0,
 		uint(h),
 		nil,
@@ -104,8 +107,9 @@ func (a *Astar) CheckSolvability() bool {
 /**
 Node
 */
+
 type Node struct {
-	Action Action
+	Action string
 	G      uint
 	H      uint
 	Parent *Node
@@ -117,19 +121,15 @@ func (n *Node) Compare(than heap.Item) int {
 	// return int((n.G + n.H) - (than.(*Node).G + than.(*Node).H))
 }
 
-func (n *Node) Tag() interface{} {
+func (n *Node) Tag() string {
 	return n.State.CreateUuid()
-}
-
-func (n *Node) Key() float64 {
-	return float64(n.G + n.H)
 }
 
 type INode interface {
 	Execute() *Node
 }
 
-func NewNode(action Action, g uint, h uint, parent *Node, state Puzzle) *Node {
+func NewNode(action string, g uint, h uint, parent *Node, state Puzzle) *Node {
 	return &Node{
 		Action: action,
 		G:      g,
@@ -139,46 +139,52 @@ func NewNode(action Action, g uint, h uint, parent *Node, state Puzzle) *Node {
 	}
 }
 
-func (n *Node) AlreadyClosed(closedList *Bst) bool {
-	_, ok := closedList.Find(BstString(n.State.CreateUuid()))
+func (n *Node) AlreadyClosed(closedList *Bst, uuid string) bool {
+	_, ok := closedList.Find(BstString(uuid))
 	return ok
 }
 
-func move(action Action, state *Puzzle, astar *Astar, n *Node) chan *Node {
+func move(action Action, state *Puzzle, astar *Astar, n *Node, results chan<- *Node) {
 	tile := state.Zero.ToTile(state.Size)
 	size := state.Size
-	ch := make(chan *Node)
-	go func() {
-		if tile.TestAction(action.Value, size) {
-			state.Move(action.Value)
-			state.CreateUuid()
-			h, err := astar.HeuristicFunction(*state, astar.Goal)
-			if err != nil {
-				log.Fatal(err)
-			}
-			ch <- NewNode(action, n.G+1, uint(h), n, *state)
-		} else {
-			ch <- nil
+	if tile.TestAction(action.Value, size) {
+		state.Move(action.Value)
+		h, err := astar.HeuristicFunction(*state, astar.Goal)
+		if err != nil {
+			log.Fatal(err)
 		}
-		close(ch)
-	}()
-	return ch
+		results <- NewNode(action.Name, n.G+1, uint(h), n, *state)
+	} else {
+		results <- nil
+	}
 }
 
-func add(newNode *Node, a *Astar) {
+func add(newNode *Node, a *Astar, uuid string) {
 	if newNode != nil {
-		if !newNode.AlreadyClosed(a.ClosedList) {
+		if !newNode.AlreadyClosed(a.ClosedList, uuid) {
 			OpenListLowerCost(a.OpenList, newNode)
 		}
 	}
 }
 
-func (n *Node) Execute(a *Astar) {
-	top, bot, left, right := <-move(L[0], n.State.Copy(), a, n), <-move(L[1], n.State.Copy(), a, n), <-move(L[2], n.State.Copy(), a, n), <-move(L[3], n.State.Copy(), a, n)
-	add(top, a)
-	add(bot, a)
-	add(left, a)
-	add(right, a)
+func worker(id <-chan int, puzzle *Puzzle, a *Astar, n *Node, results chan<- *Node) {
+	move(L[<-id], puzzle, a, n, results)
+}
+
+func (n *Node) Execute(a *Astar, uuid string) {
+	id := make(chan int, len(L))
+	nodes := make(chan *Node, len(L))
+	for range L {
+		go worker(id, n.State.Copy(), a, n, nodes)
+	}
+	for _, v := range L {
+		id <- v.Value
+	}
+	close(id)
+	for range L {
+		add(<-nodes, a, uuid)
+	}
+	close(nodes)
 }
 
 func OpenListLowerCost(o *rank_paring.RPHeap, newNode *Node) {
@@ -186,7 +192,7 @@ func OpenListLowerCost(o *rank_paring.RPHeap, newNode *Node) {
 }
 
 func (n *Node) PrintNode() {
-	fmt.Println("Move :", n.Action.Name)
+	fmt.Println("Move :", n.Action)
 	n.State.PrintPuzzle()
 	fmt.Println("Cost:", n.H, "| Depth:", n.G)
 	fmt.Println()
