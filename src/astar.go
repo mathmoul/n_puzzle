@@ -52,11 +52,6 @@ func NewAstar(p Puzzle, h, c uint) *Astar {
 	}
 }
 
-// Run function Runs the astar algorithm
-func (a *Astar) Run(size int /*FCost SortList */) (q *Node, err error) {
-	return runN(a)
-}
-
 /*
 RootNode func
 */

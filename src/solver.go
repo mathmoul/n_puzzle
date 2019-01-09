@@ -14,8 +14,9 @@ func Start(p Puzzle, h uint, c uint) {
 	if !a.CheckSolvability() {
 		log.Fatal("This puzzle is unsolvable")
 	}
-	fmt.Println("Searching solution...")
-	if n, err := a.Run(p.Size); err != nil {
+	// t := make(chan uint)
+	// m := make(chan uint)
+	if n, err := runN(a); err != nil {
 		log.Fatal(err)
 	} else {
 		n.PrintResult()
