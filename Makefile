@@ -27,7 +27,7 @@ fclean:
 re: fclean all
 
 debug:
-	go build -gcflags "-m -l" -o $(DEBUG) $(SRC) 
+	go build -gcflags "-m -m -l" -o $(DEBUG) $(SRC) 
 
 fclean_debug:
 	@rm -rfv $(DEBUG)

@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	var p Puzzle
+	var p *Puzzle
 	f, err := Parse()
 	if err != nil {
 		log.Fatal(err)
@@ -19,11 +19,10 @@ func main() {
 			log.Fatal(err)
 		}
 	} else {
-		u, err := File(f.Args)
+		p, err = File(f.Args)
 		if err != nil {
 			log.Fatal(err)
 		}
-		p = *u
 	}
 	Start(p, f.Heuristic-1, f.Cost)
 }

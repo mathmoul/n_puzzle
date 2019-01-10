@@ -8,14 +8,12 @@ import (
 var costFunction CostFunction
 
 // Start function init astar
-func Start(p Puzzle, h uint, c uint) {
+func Start(p *Puzzle, h uint, c uint) {
 	a := NewAstar(p, h, c)
 	costFunction = FindCostFunction(c)
 	if !a.CheckSolvability() {
 		log.Fatal("This puzzle is unsolvable")
 	}
-	// t := make(chan uint)
-	// m := make(chan uint)
 	if n, err := runN(a); err != nil {
 		log.Fatal(err)
 	} else {
@@ -36,24 +34,25 @@ func runN(a *Astar /* , FCost */) (q *Node, err error) {
 	}
 	for a.OpenList.Size() > 0 {
 		node := a.OpenList.DeleteMin()
+		state := decompute(node.(*Node).State)
+		uuid := state.CreateUuid()
 
-		uuid := node.(*Node).State.CreateUuid()
-
-		if node.(*Node).H == 0 {
+		if *node.(*Node).H == 0 {
 			return node.(*Node), nil
 		}
 
-		a.Turns++
-		node.(*Node).Execute(a, *uuid)
+		(*a).Turns++
+		node.(*Node).Execute(a, uuid, state)
 		num := a.OpenList.Size()
 		if num > int(a.MaxState) {
 			a.MaxState = uint(num)
 		}
 		if a.ClosedList == nil {
-			a.ClosedList = NewBst(BstString(*uuid))
+			a.ClosedList = NewBst(uuid)
 		} else {
-			a.ClosedList.Insert(BstString(*uuid))
+			a.ClosedList.Insert(uuid)
 		}
+		state = nil
 		node = nil
 	}
 	return
@@ -64,21 +63,23 @@ func move(action Action, state *Puzzle, astar *Astar, n *Node, results chan<- *N
 	size := state.Size
 	if tile.TestAction(action.Value, size) {
 		state.Move(action.Value)
-		h, err := astar.HeuristicFunction(*state, astar.Goal)
+		h, err := astar.HeuristicFunction(state, astar.Goal)
 		if err != nil {
 			log.Fatal(err)
 		}
-		results <- NewNode(action.Name, n.G+1, uint(h), n, state)
+		results <- NewNode(&action.Name, *n.G+1, uint(h), n, state)
 	} else {
 		results <- nil
 	}
 	tile = nil
 }
 
-func add(newNode *Node, a *Astar, uuid string) {
+func add(newNode *Node, a *Astar, uuid BstString) {
 	if newNode != nil {
 		if !newNode.AlreadyClosed(a.ClosedList, uuid) {
 			a.OpenList.Insert(newNode)
+		} else {
+			newNode = nil
 		}
 	}
 }

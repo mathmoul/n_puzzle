@@ -11,20 +11,20 @@ Node
 */
 
 type Node struct {
-	Action string
-	G      uint
-	H      uint
+	Action *string
+	G      *uint
+	H      *uint
 	Parent *Node
-	State  *Puzzle
+	State  string
 }
 
-func NewNode(action string, g uint, h uint, parent *Node, state *Puzzle) *Node {
+func NewNode(action *string, g uint, h uint, parent *Node, state *Puzzle) *Node {
 	return &Node{
 		Action: action,
-		G:      g,
-		H:      h,
+		G:      &g,
+		H:      &h,
 		Parent: parent,
-		State:  state,
+		State:  state.compute(),
 	}
 }
 
@@ -32,24 +32,16 @@ func (n *Node) Compare(than heap.Item) int {
 	return costFunction(n, than.(*Node))
 }
 
-// func (n *Node) Tag() *string {
-// 	return n.State.CreateUuid()
-// }
-
-type INode interface {
-	Execute() *Node
-}
-
-func (n *Node) AlreadyClosed(closedList *Bst, uuid string) bool {
-	_, ok := closedList.Find(BstString(uuid))
+func (n *Node) AlreadyClosed(closedList *Bst, uuid BstString) bool {
+	ok := closedList.Find(BstString(uuid))
 	return ok
 }
 
-func (n Node) Execute(a *Astar, uuid string) {
+func (n Node) Execute(a *Astar, uuid BstString, state *Puzzle) {
 	id := make(chan int, len(L))
 	nodes := make(chan *Node, len(L))
 	for range L {
-		go worker(id, n.State.Copy(), a, &n, nodes)
+		go worker(id, state.Copy(), a, &n, nodes)
 	}
 	for _, v := range L {
 		id <- v.Value
@@ -64,9 +56,9 @@ func (n Node) Execute(a *Astar, uuid string) {
 }
 
 func (n *Node) PrintNode() {
-	fmt.Println("Move :", n.Action)
-	n.State.PrintPuzzle()
-	fmt.Println("Cost:", n.H, "| Depth:", n.G)
+	fmt.Println("Move :", *n.Action)
+	decompute(n.State).PrintPuzzle()
+	fmt.Println("Cost:", *n.H, "| Depth:", *n.G)
 	fmt.Println()
 }
 

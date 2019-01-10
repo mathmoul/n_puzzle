@@ -7,7 +7,7 @@ import (
 )
 
 type Astar struct {
-	Puzzle
+	*Puzzle
 	Goal       Puzzle
 	OpenList   *rank_paring.RPHeap
 	ClosedList *Bst
@@ -15,22 +15,6 @@ type Astar struct {
 	MaxState   uint
 	HeuristicFunction
 }
-
-// type IAstar interface {
-// 	ManhattanHeuristic() (ret int, err error)
-// 	LinearHeuristic() (ret int, err error)
-// 	MisplacedHeuristic() (ret int, err error)
-
-// 	Run() (err error)
-
-// 	RootNode(action int, parent *Node) (err error)
-
-// 	PrintResult() (err error)
-
-// 	S()
-
-// 	Done() bool
-// }
 
 func (a *Astar) Done() bool {
 	return false
@@ -40,7 +24,7 @@ func (a *Astar) S() {
 	fmt.Println("A* =>", a)
 }
 
-func NewAstar(p Puzzle, h, c uint) *Astar {
+func NewAstar(p *Puzzle, h, c uint) *Astar {
 	return &Astar{
 		Puzzle:            p,
 		Goal:              Goal(p.Size),
@@ -57,17 +41,16 @@ RootNode func
 */
 func (a *Astar) RootNode(action int) (err error) {
 	var h int
-	currentState := a.Puzzle
-	h, err = a.HeuristicFunction(currentState, a.Goal)
+	h, err = a.HeuristicFunction(a.Puzzle, a.Goal)
 	if err != nil {
 		return
 	}
 	a.OpenList.Insert(NewNode(
-		None.Name,
+		&None.Name,
 		0,
 		uint(h),
 		nil,
-		&a.Puzzle))
+		a.Puzzle))
 	return
 }
 

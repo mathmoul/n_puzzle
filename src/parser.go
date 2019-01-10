@@ -69,7 +69,6 @@ func (d *Datas) ListCheckSize(l *list.List) error {
 }
 
 func DataFromList(l *list.List) (d *Datas, err error) {
-	d = new(Datas)
 	i := -1
 	for e := l.Front(); e != nil; e = e.Next() {
 		if i == -1 {

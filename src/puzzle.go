@@ -57,30 +57,27 @@ func (b Board) MoveRight(i int) {
 }
 
 func (p *Puzzle) makeGoals() {
-	u := p.Board
-	s := p.Size
 	cur, ix := 1, 1
 	x, y, iy := 0, 0, 0
 	for true {
-		u[x+y*s] = cur
+		(p.Board)[x+y*p.Size] = cur
 		if cur == 0 {
 			break
 		}
 		cur++
-		if x+ix == s || x+ix < 0 || (ix != 0 && u[x+ix+y*s] != -1) {
+		if x+ix == p.Size || x+ix < 0 || (ix != 0 && (p.Board)[x+ix+y*p.Size] != -1) {
 			iy = ix
 			ix = 0
-		} else if y+iy == s || y+iy < 0 || (iy != 0 && u[x+(y+iy)*s] != -1) {
+		} else if y+iy == p.Size || y+iy < 0 || (iy != 0 && (p.Board)[x+(y+iy)*p.Size] != -1) {
 			ix = -iy
 			iy = 0
 		}
 		x += ix
 		y += iy
-		if cur == s*s {
+		if cur == p.Size*p.Size {
 			cur = 0
 		}
 	}
-	p.Board = u
 }
 
 func initPuzzle(size int) *Puzzle {
@@ -150,17 +147,16 @@ func (p *Puzzle) zeroIndex() (err error) {
 }
 
 // Generate function
-func Generate() (p Puzzle, err error) {
+func Generate() (p *Puzzle, err error) {
 	f := Get()
-	tmp := initPuzzle(f.Size)
-	if err = tmp.makePuzzle(f.Solvable, f.Iterations); err != nil {
+	p = initPuzzle(f.Size)
+	if err = p.makePuzzle(f.Solvable, f.Iterations); err != nil {
 		return
 	}
-	if err = tmp.zeroIndex(); err != nil {
+	if err = p.zeroIndex(); err != nil {
 		return
 	}
-	tmp.TabTiles()
-	p = *tmp
+	p.TabTiles()
 	return
 }
 
@@ -226,15 +222,33 @@ type Puzzle struct {
 	Tiles
 }
 
-func (p *Puzzle) CreateUuid() *string {
+func decompute(str string) *Puzzle {
+	t1 := strings.Split(str, "#")
+	var board Board
+	size, _ := strconv.Atoi(t1[1])
+	t2 := strings.Split(t1[0], "|")
+	board = make([]int, size*size)
+	for i := 0; i < size*size; i++ {
+		y, _ := strconv.Atoi(t2[i])
+		board[i] = y
+	}
+	p := &Puzzle{
+		Board: board,
+		Size:  size,
+		Tiles: make([]Tile, size*size),
+	}
+	p.TabTiles()
+	p.zeroIndex()
+	return p
+}
+
+func (p *Puzzle) CreateUuid() BstString {
 	b := p.Board
 	tab := make([]string, p.Size*p.Size)
 	for k, v := range b {
 		tab[k] = strconv.Itoa(v)
 	}
-	var s *string
-	*s = strings.Join(tab, "|")
-	return s
+	return BstString(strings.Join(tab, "|"))
 }
 
 func (b Board) Copy(i int) Board {
@@ -328,4 +342,8 @@ func (t *Tile) Right() bool {
 
 func (t *TileIndex) ToTile(s int) (y *Tile) {
 	return &Tile{t.I % s, t.I / s}
+}
+
+func (p *Puzzle) compute() string {
+	return string(p.CreateUuid()) + "#" + strconv.Itoa(p.Size)
 }
