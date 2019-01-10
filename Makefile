@@ -2,6 +2,7 @@ NAME=n_puzzle
 SRC_PATH=src
 GO=go
 BUILD=build
+DEBUG=debug
 
 SRC_NAME=actions.go \
 bst.go \
@@ -24,3 +25,11 @@ fclean:
 	rm -rf $(NAME)
 
 re: fclean all
+
+debug:
+	go build -gcflags "-m -l" -o $(DEBUG) $(SRC) 
+
+fclean_debug:
+	@rm -rfv $(DEBUG)
+
+re_debug: fclean_debug debug

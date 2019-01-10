@@ -32,9 +32,9 @@ func (n *Node) Compare(than heap.Item) int {
 	return costFunction(n, than.(*Node))
 }
 
-func (n *Node) Tag() string {
-	return n.State.CreateUuid()
-}
+// func (n *Node) Tag() *string {
+// 	return n.State.CreateUuid()
+// }
 
 type INode interface {
 	Execute() *Node
@@ -45,11 +45,11 @@ func (n *Node) AlreadyClosed(closedList *Bst, uuid string) bool {
 	return ok
 }
 
-func (n *Node) Execute(a *Astar, uuid string) {
+func (n Node) Execute(a *Astar, uuid string) {
 	id := make(chan int, len(L))
 	nodes := make(chan *Node, len(L))
 	for range L {
-		go worker(id, n.State.Copy(), a, n, nodes)
+		go worker(id, n.State.Copy(), a, &n, nodes)
 	}
 	for _, v := range L {
 		id <- v.Value

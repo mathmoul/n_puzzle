@@ -16,21 +16,21 @@ type Astar struct {
 	HeuristicFunction
 }
 
-type IAstar interface {
-	ManhattanHeuristic() (ret int, err error)
-	LinearHeuristic() (ret int, err error)
-	MisplacedHeuristic() (ret int, err error)
+// type IAstar interface {
+// 	ManhattanHeuristic() (ret int, err error)
+// 	LinearHeuristic() (ret int, err error)
+// 	MisplacedHeuristic() (ret int, err error)
 
-	Run() (err error)
+// 	Run() (err error)
 
-	RootNode(action int, parent *Node) (err error)
+// 	RootNode(action int, parent *Node) (err error)
 
-	PrintResult() (err error)
+// 	PrintResult() (err error)
 
-	S()
+// 	S()
 
-	Done() bool
-}
+// 	Done() bool
+// }
 
 func (a *Astar) Done() bool {
 	return false

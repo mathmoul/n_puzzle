@@ -226,13 +226,15 @@ type Puzzle struct {
 	Tiles
 }
 
-func (p *Puzzle) CreateUuid() string {
+func (p *Puzzle) CreateUuid() *string {
 	b := p.Board
 	tab := make([]string, p.Size*p.Size)
 	for k, v := range b {
 		tab[k] = strconv.Itoa(v)
 	}
-	return strings.Join(tab, "|")
+	var s *string
+	*s = strings.Join(tab, "|")
+	return s
 }
 
 func (b Board) Copy(i int) Board {

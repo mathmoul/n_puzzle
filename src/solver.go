@@ -44,15 +44,15 @@ func runN(a *Astar /* , FCost */) (q *Node, err error) {
 		}
 
 		a.Turns++
-		node.(*Node).Execute(a, uuid)
+		node.(*Node).Execute(a, *uuid)
 		num := a.OpenList.Size()
 		if num > int(a.MaxState) {
 			a.MaxState = uint(num)
 		}
 		if a.ClosedList == nil {
-			a.ClosedList = NewBst(BstString(uuid))
+			a.ClosedList = NewBst(BstString(*uuid))
 		} else {
-			a.ClosedList.Insert(BstString(uuid))
+			a.ClosedList.Insert(BstString(*uuid))
 		}
 		node = nil
 	}

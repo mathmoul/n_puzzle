@@ -59,8 +59,8 @@ func (a Integer) Compare(b Item) int {
 }
 
 // NewBst returns *BST
-func NewBst(item Item) *Bst {
-	return &Bst{Item: item}
+func NewBst(item *Item) *Bst {
+	return &Bst{Item: *item}
 }
 
 // Insert new `Item` on BST
