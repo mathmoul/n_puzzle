@@ -35,18 +35,20 @@ func File(av []string) (puzzle *Puzzle, err error) {
 	if err != nil {
 		return nil, err
 	}
+	if len(d.Board) == 0 {
+		return nil, fmt.Errorf("Issue with input")
+	}
 	return PuzzleFromDatas(d.Size, d.Board)
 }
 
 func ScanToList(text string) (*list.List, error) {
-	l := list.New()
 	tab := strings.Fields(text)
+	l := list.New()
 	for i := range tab {
 		if rune(tab[i][0]) == rune('#') {
 			return l, nil
-		} else {
-			l.PushBack(tab[i])
 		}
+		l.PushBack(tab[i])
 	}
 	return l, nil
 }
@@ -93,7 +95,6 @@ func DataFromList(l *list.List) (d *Datas, err error) {
 				if err = CheckNumberIntoBoard(v, d.Size, d.Board); err != nil {
 					return nil, err
 				}
-				fmt.Println(" v->", v)
 				d.Board[i] = v
 				i++
 				cpt++
