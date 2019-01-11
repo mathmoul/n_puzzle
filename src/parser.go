@@ -69,7 +69,9 @@ func (d *Datas) ListCheckSize(l *list.List) error {
 }
 
 func DataFromList(l *list.List) (d *Datas, err error) {
+	d = new(Datas)
 	i := -1
+	cpt := 0
 	for e := l.Front(); e != nil; e = e.Next() {
 		if i == -1 {
 			if err = d.ListCheckSize(e.Value.(*list.List)); err != nil {
@@ -91,13 +93,18 @@ func DataFromList(l *list.List) (d *Datas, err error) {
 				if err = CheckNumberIntoBoard(v, d.Size, d.Board); err != nil {
 					return nil, err
 				}
+				fmt.Println(" v->", v)
 				d.Board[i] = v
 				i++
+				cpt++
 			}
 			i--
 		}
 		// Si le nombre est superieur ou egal a 0 inferieur a size * size, pas deja utilise ou
 		i++
+	}
+	if cpt < d.Size*d.Size {
+		return nil, fmt.Errorf("Issue with puzzle, missing datas")
 	}
 	return
 }
