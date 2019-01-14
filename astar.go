@@ -39,10 +39,9 @@ func NewAstar(p *Puzzle, h, c uint) *Astar {
 /*
 RootNode func
 */
-func (a *Astar) RootNode(action int) (err error) {
+func (a *Astar) RootNode() (err error) {
 	var h int
-	h, err = a.HeuristicFunction(a.Puzzle, a.Goal)
-	if err != nil {
+	if h, err = a.HeuristicFunction(a.Puzzle, a.Goal); err != nil {
 		return
 	}
 	a.OpenList.Insert(NewNode(

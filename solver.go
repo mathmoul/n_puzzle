@@ -23,40 +23,58 @@ func Start(p *Puzzle, h uint, c uint) {
 	}
 }
 
-const (
-	//No action
-	No = iota
-)
-
 func runN(a *Astar /* , FCost */) (q *Node, err error) {
-	if err = a.RootNode(No); err != nil {
+	if err = a.RootNode(); err != nil {
 		return
 	}
-	for a.OpenList.Size() > 0 {
-		node := a.OpenList.DeleteMin()
-		state := decompute(node.(*Node).State)
-		uuid := state.CreateUuid()
 
-		if *node.(*Node).H == 0 {
-			return node.(*Node), nil
+	for a.OpenList.Size() > 0 {
+		senderNodes := make(chan *Node, 1)
+		// receiverNodes := make(chan *Node, 1)
+		uuidChan := make(chan BstString, 1)
+		stateChan := make(chan *Puzzle, 1)
+
+		go executeWorker(senderNodes, a, uuidChan, stateChan)
+
+		heapItem := a.OpenList.DeleteMin()
+		stateChan <- decompute(heapItem.(*Node).State)
+		uuidChan <- (<-stateChan).CreateUuid()
+
+		if *heapItem.(*Node).H == 0 {
+			return heapItem.(*Node), nil
 		}
 
 		(*a).Turns++
-		node.(*Node).Execute(a, uuid, state)
+
+		senderNodes <- heapItem.(*Node)
 		num := a.OpenList.Size()
 		if num > int(a.MaxState) {
 			a.MaxState = uint(num)
 		}
 		if a.ClosedList == nil {
-			a.ClosedList = NewBst(uuid)
+			a.ClosedList = NewBst(<-uuidChan)
 		} else {
-			a.ClosedList.Insert(uuid)
+			a.ClosedList.Insert(<-uuidChan)
 		}
-		state = nil
-		node = nil
 	}
 	return
 }
+
+// func Execute(senderNodes <-chan *Node, receiverNodes chan<- *Node, a *Astar, uuid <-chan BstString, state <-chan *Puzzle) {
+// 	id := make(chan int, len(L))
+// 	nodes := make(chan *Node, len(L))
+// 	for range L {
+// 		go worker(id, state.Copy(), a, n, nodes)
+// 	}
+// 	for _, v := range L {
+// 		id <- v.Value
+// 	}
+// 	close(id)
+// 	for range L {
+// 		add(<-nodes, a, uuid)
+// 	}
+// 	close(nodes)
+// }
 
 func move(action Action, state *Puzzle, astar *Astar, n *Node, results chan<- *Node) {
 	tile := state.Zero.ToTile(state.Size)

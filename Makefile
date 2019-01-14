@@ -1,5 +1,5 @@
 NAME=n_puzzle
-SRC_PATH=src
+SRC_PATH=.
 GO=go
 BUILD=build
 DEBUG=debug
@@ -13,7 +13,8 @@ solver.go \
 tools.go \
 astar.go \
 node.go \
-heuristic.go
+heuristic.go \
+worker.go
 
 all: $(NAME)
 SRC = $(addprefix $(SRC_PATH)/, $(SRC_NAME))

@@ -37,24 +37,6 @@ func (n *Node) AlreadyClosed(closedList *Bst, uuid BstString) bool {
 	return ok
 }
 
-func (n Node) Execute(a *Astar, uuid BstString, state *Puzzle) {
-	id := make(chan int, len(L))
-	nodes := make(chan *Node, len(L))
-	for range L {
-		go worker(id, state.Copy(), a, &n, nodes)
-	}
-	for _, v := range L {
-		id <- v.Value
-	}
-	close(id)
-	for range L {
-		add(<-nodes, a, uuid)
-	}
-	close(nodes)
-	id = nil
-	nodes = nil
-}
-
 func (n *Node) PrintNode() {
 	fmt.Println("Move :", *n.Action)
 	decompute(n.State).PrintPuzzle()
