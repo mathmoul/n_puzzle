@@ -1,5 +1,5 @@
 NAME=n_puzzle
-SRC_PATH=src
+SRC_PATH=.
 GO=go
 BUILD=build
 DEBUG=debug
@@ -19,6 +19,7 @@ all: $(NAME)
 SRC = $(addprefix $(SRC_PATH)/, $(SRC_NAME))
 
 $(NAME): $(SRC)
+	go get
 	go build -o $(NAME) $(SRC)
 
 fclean:
@@ -27,6 +28,7 @@ fclean:
 re: fclean all
 
 debug:
+	go get
 	go build -gcflags "-m -m -l" -o $(DEBUG) $(SRC) 
 
 fclean_debug:
